@@ -68,8 +68,9 @@ android {
 }
 
 repositories {
-  mavenCentral()
   google()
+  mavenCentral()
+  maven { url 'https://jitpack.io' }
 }
 
 def kotlin_version = getExtOrDefault("kotlinVersion")
@@ -77,5 +78,8 @@ def kotlin_version = getExtOrDefault("kotlinVersion")
 dependencies {
   implementation "com.facebook.react:react-android"
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+  implementation "com.github.apps-on-air:AppsOnAir-android-AppLink:0.0.1"
+  implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1"
+  implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1"
 }
 
