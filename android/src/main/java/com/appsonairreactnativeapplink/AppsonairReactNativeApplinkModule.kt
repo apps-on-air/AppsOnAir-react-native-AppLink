@@ -91,7 +91,18 @@ class AppsonairReactNativeApplinkModule(reactContext: ReactApplicationContext) :
     try {
       val referral = deeplinkService?.getReferralDetails()
       if (referral != null) {
-        promise.resolve(referral)
+        val referralMap = Arguments.createMap()
+        referral.keys().forEach { key ->
+          val value = referral.opt(key)
+          when (value) {
+            is String -> referralMap.putString(key, value)
+            is Int -> referralMap.putInt(key, value)
+            is Double -> referralMap.putDouble(key, value)
+            is Boolean -> referralMap.putBoolean(key, value)
+            else -> referralMap.putString(key, value?.toString() ?: "")
+          }
+        }
+        promise.resolve(referralMap)
       } else {
         promise.reject("NO_REFERRAL", "No referral details available")
       }
