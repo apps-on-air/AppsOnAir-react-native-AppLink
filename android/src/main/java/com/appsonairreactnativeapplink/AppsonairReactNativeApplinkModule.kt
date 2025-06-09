@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import com.appsonair.applink.interfaces.AppLinkListener
 import com.appsonair.applink.services.AppLinkService
 import com.facebook.react.bridge.*
@@ -34,7 +33,6 @@ class AppsonairReactNativeApplinkModule(reactContext: ReactApplicationContext) :
     deeplinkService = AppLinkService.getInstance(activity)
     deeplinkService?.initialize(context, activity.intent, object : AppLinkListener {
       override fun onDeepLinkProcessed(uri: Uri, result: JSONObject) {
-        Log.d(NAME, "Deep link processed: $uri, result: $result")
         sendEvent("onDeepLinkProcessed", Arguments.fromBundle(Bundle().apply {
           putString("url", uri.toString())
           putString("result", result.toString())
@@ -42,7 +40,6 @@ class AppsonairReactNativeApplinkModule(reactContext: ReactApplicationContext) :
       }
 
       override fun onDeepLinkError(uri: Uri?, error: String) {
-        Log.e(NAME, "Deep link error: $error")
         sendEvent("onDeepLinkError", Arguments.fromBundle(Bundle().apply {
           putString("url", uri?.toString() ?: "")
           putString("error", error)
@@ -86,6 +83,20 @@ class AppsonairReactNativeApplinkModule(reactContext: ReactApplicationContext) :
       } catch (e: Exception) {
         promise.reject("CREATE_FAILED", e.message, e)
       }
+    }
+  }
+
+  @ReactMethod
+  fun getReferralDetails(promise: Promise) {
+    try {
+      val referral = deeplinkService?.getReferralDetails()
+      if (referral != null) {
+        promise.resolve(referral)
+      } else {
+        promise.reject("NO_REFERRAL", "No referral details available")
+      }
+    } catch (e: Exception) {
+      promise.reject("REFERRAL_ERROR", e.message, e)
     }
   }
 

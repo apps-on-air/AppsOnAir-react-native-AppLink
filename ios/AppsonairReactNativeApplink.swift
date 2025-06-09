@@ -65,16 +65,6 @@ class AppsonairReactNativeApplink: RCTEventEmitter {
           } else {
             self.pendingDeepLinkEvent = eventData
           }
-        } else {
-          let eventData: [String: Any] = [
-            "url": "",
-            "error": "Failed to process deep link"
-          ]
-          if self.hasListeners {
-            self.sendEvent(withName: "onDeepLinkError", body: eventData)
-          } else {
-            self.pendingDeepLinkEvent = eventData
-          }
         }
       }
     }
@@ -137,6 +127,16 @@ class AppsonairReactNativeApplink: RCTEventEmitter {
         let code = linkInfo["statusCode"] as? Int ?? 500
         reject("CREATE_FAILED", message, NSError(domain: "", code: code))
       }
+    }
+  }
+
+  @objc(getReferralDetails:withRejecter:)
+  func getReferralDetails(
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) {
+    appOnAirLinkService.getReferralDetails { linkInfo in
+      resolve(linkInfo)
     }
   }
 }
