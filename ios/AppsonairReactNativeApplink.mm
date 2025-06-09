@@ -1,6 +1,7 @@
 #import <React/RCTBridgeModule.h>
+#import <React/RCTEventEmitter.h>
 
-@interface RCT_EXTERN_MODULE(AppsonairReactNativeApplink, NSObject)
+@interface RCT_EXTERN_MODULE(AppsonairReactNativeApplink, RCTEventEmitter)
 
 RCT_EXTERN_METHOD(initialize:(RCTPromiseResolveBlock)resolve
                   withRejecter:(RCTPromiseRejectBlock)reject)
@@ -11,10 +12,5 @@ RCT_EXTERN_METHOD(createAppLink:(NSDictionary *)params
 
 RCT_EXTERN_METHOD(addListener:(NSString *)eventName)
 RCT_EXTERN_METHOD(removeListeners:(double)count)
-
-+ (BOOL)requiresMainQueueSetup
-{
-  return YES;
-}
 
 @end

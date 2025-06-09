@@ -3,42 +3,100 @@ import React
 import AppsOnAir_AppLink
 
 @objc(AppsonairReactNativeApplink)
-class AppsonairReactNativeApplink: NSObject {
+class AppsonairReactNativeApplink: RCTEventEmitter {
+    
+  private var hasListeners = false
+  private var pendingEvents: [[String: Any]] = []
+    
+  private var pendingDeepLinkEvent: [String: Any]? = nil
 
-  let appOnAirLinkService = AppLinkService.shared
+  override func supportedEvents() -> [String] {
+    return ["onDeepLinkProcessed", "onDeepLinkError"]
+  }
+
+  override static func requiresMainQueueSetup() -> Bool {
+    return true
+  }
+
+  private let appOnAirLinkService = AppLinkService.shared
+
+  @objc override func addListener(_ eventName: String) {
+    super.addListener(eventName)
+    startObserving()
+  }
+
+  @objc override func removeListeners(_ count: Double) {
+    stopObserving()
+  }
+
+  override func startObserving() {
+    hasListeners = true
+
+    if let event = pendingDeepLinkEvent {
+      sendEvent(withName: "onDeepLinkProcessed", body: event)
+      pendingDeepLinkEvent = nil
+    }
+
+    for event in pendingEvents {
+      if let name = event["name"] as? String,
+      let body = event["body"] as? [String: Any] {
+        sendEvent(withName: name, body: body)
+      }
+    }
+    pendingEvents.removeAll()
+  }
+
+  override func stopObserving() {
+    hasListeners = false
+  }
 
   @objc(initialize:withRejecter:)
   func initialize(resolve: @escaping RCTPromiseResolveBlock,
                   reject: @escaping RCTPromiseRejectBlock) {
-
-    appOnAirLinkService.initialize { url, linkInfo in
-      if let url = url {
-        let eventData: [String: Any] = [
-          "url": url.absoluteString,
-          "result": linkInfo
-        ]
-
-        self.sendEvent(name: "onDeepLinkProcessed", body: eventData)
-      } else {
-        let eventData: [String: Any] = [
-          "url": "",
-          "error": "Failed to process deep link"
-        ]
-        self.sendEvent(name: "onDeepLinkError", body: eventData)
+    DispatchQueue.main.async {
+      self.appOnAirLinkService.initialize { url, linkInfo in
+        if let url = url {
+          let eventData: [String: Any] = [
+            "url": url.absoluteString,
+            "result": linkInfo
+          ]
+          if self.hasListeners {
+            self.sendEvent(withName: "onDeepLinkProcessed", body: eventData)
+          } else {
+            self.pendingDeepLinkEvent = eventData
+          }
+        } else {
+          let eventData: [String: Any] = [
+            "url": "",
+            "error": "Failed to process deep link"
+          ]
+          if self.hasListeners {
+            self.sendEvent(withName: "onDeepLinkError", body: eventData)
+          } else {
+            self.pendingDeepLinkEvent = eventData
+          }
+        }
       }
     }
-    
     resolve(true)
+  }
+
+  private func sendEvent(name: String, body: [String: Any]) {
+    if hasListeners {
+      self.sendEvent(withName: name, body: body)
+    } else {
+      pendingEvents.append(["name": name, "body": body])
+    }
   }
 
   @objc(createAppLink:withResolver:withRejecter:)
   func createAppLink(params: NSDictionary,
-                     resolve: @escaping RCTPromiseResolveBlock,
-                     reject: @escaping RCTPromiseRejectBlock) {
+                    resolve: @escaping RCTPromiseResolveBlock,
+                    reject: @escaping RCTPromiseRejectBlock) {
 
     guard let url = params["url"] as? String,
-          let name = params["name"] as? String,
-          let urlPrefix = params["urlPrefix"] as? String else {
+    let name = params["name"] as? String,
+    let urlPrefix = params["urlPrefix"] as? String else {
       reject("INVALID_PARAMS", "Missing required parameters", nil)
       return
     }
@@ -53,7 +111,7 @@ class AppsonairReactNativeApplink: NSObject {
 
     let isOpenInBrowserApple = params["isOpenInBrowserApple"] as? Bool ?? false
     let isOpenInIosApp = params["isOpenInIosApp"] as? Bool ?? true
-    let iOSFallbackUrl = params["iOSFallbackUrl"] as? String ?? ""
+      let iOSFallbackUrl = params["iOSFallbackUrl"] as? String ?? ""
 
     let isOpenInBrowserAndroid = params["isOpenInBrowserAndroid"] as? Bool ?? false
     let isOpenInAndroidApp = params["isOpenInAndroidApp"] as? Bool ?? true
@@ -68,8 +126,8 @@ class AppsonairReactNativeApplink: NSObject {
       isOpenInBrowserApple: isOpenInBrowserApple,
       isOpenInIosApp: isOpenInIosApp,
       iOSFallbackUrl: iOSFallbackUrl,
-      isOpenInBrowserAndroid: isOpenInBrowserAndroid,
       isOpenInAndroidApp: isOpenInAndroidApp,
+      isOpenInBrowserAndroid: isOpenInBrowserAndroid,
       androidFallbackUrl: androidFallbackUrl
     ) { linkInfo in
       if let status = linkInfo["status"] as? String, status == "SUCCESS" {
@@ -80,31 +138,5 @@ class AppsonairReactNativeApplink: NSObject {
         reject("CREATE_FAILED", message, NSError(domain: "", code: code))
       }
     }
-  }
-
-  private func sendEvent(name: String, body: [String: Any]) {
-    if let bridge = RCTBridge.current() {
-      bridge.enqueueJSCall(
-        "RCTDeviceEventEmitter",
-        method: "emit",
-        args: [name, body],
-        completion: nil
-      )
-    }
-  }
-
-  @objc
-  func addListener(_ eventName: NSString) {
-    // No-op: Required by RN
-  }
-
-  @objc
-  func removeListeners(_ count: Double) {
-    // No-op: Required by RN
-  }
-
-  @objc
-  static func requiresMainQueueSetup() -> Bool {
-    return true
   }
 }
