@@ -1,18 +1,21 @@
 {
   "name": "appsonair-react-native-applink",
   "version": "0.0.1",
-  "description": "Seamless deep linking for React Native apps using AppsOnAir Dynamic Links.",
+  "description": "A self-hosted dynamic link service for app download tracking, deep linking, and engagement analytics.",
   "source": "./src/index.tsx",
   "main": "./lib/commonjs/index.js",
   "module": "./lib/module/index.js",
   "exports": {
     ".": {
+      "import": {
+        "types": "./lib/typescript/module/src/index.d.ts",
+        "default": "./lib/module/index.js"
+      },
       "require": {
         "types": "./lib/typescript/commonjs/src/index.d.ts",
         "default": "./lib/commonjs/index.js"
       }
-    },
-    "./package.json": "./package.json"
+    }
   },
   "files": [
     "src",
@@ -45,7 +48,17 @@
   "keywords": [
     "react-native",
     "ios",
-    "android"
+    "android",
+    "deep-linking",
+    "deeplink",
+    "universal-links",
+    "app-links",
+    "referral",
+    "referral-tracking",
+    "appsonair",
+    "url-routing",
+    "react-native-linking",
+    "dynamic-links"
   ],
   "repository": {
     "type": "git",
