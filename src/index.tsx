@@ -47,10 +47,36 @@ export const initializeAppLink = async (): Promise<boolean> => {
  * @param {AppLinkParams} params - Parameters used to generate the deep link.
  * @returns {Promise<CreateAppLinkResponse>} A promise that resolves to the generated deep link URL, or `null` if creation fails.
  */
-export const createAppLink = async (
-  params: AppLinkParams
-): Promise<CreateAppLinkResponse> => {
-  const result = await AppsonairReactNativeApplink.createAppLink(params);
+export const createAppLink = async ({
+  url,
+  name,
+  urlPrefix,
+  shortId = '',
+  metaTitle = '',
+  metaDescription = '',
+  metaImageUrl = '',
+  isOpenInBrowserAndroid = false,
+  isOpenInAndroidApp = true,
+  androidFallbackUrl = '',
+  isOpenInBrowserApple = false,
+  isOpenInIosApp = true,
+  iOSFallbackUrl = '',
+}: AppLinkParams): Promise<CreateAppLinkResponse> => {
+  const result = await AppsonairReactNativeApplink.createAppLink({
+    url,
+    name,
+    urlPrefix,
+    shortId,
+    metaTitle,
+    metaDescription,
+    metaImageUrl,
+    isOpenInBrowserAndroid,
+    isOpenInAndroidApp,
+    androidFallbackUrl,
+    isOpenInBrowserApple,
+    isOpenInIosApp,
+    iOSFallbackUrl,
+  });
 
   if (typeof result === 'string') {
     return JSON.parse(result);
