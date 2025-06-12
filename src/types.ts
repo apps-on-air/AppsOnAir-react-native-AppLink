@@ -1,4 +1,4 @@
-export interface AppLinkParams {
+export type AppLinkParams = {
   url: string;
   name: string;
   urlPrefix: string;
@@ -12,12 +12,20 @@ export interface AppLinkParams {
   isOpenInBrowserApple?: boolean;
   isOpenInIosApp?: boolean;
   iOSFallbackUrl?: string;
-}
+};
 
-export interface CreateAppLinkResponse {
-  status: string;
-  data: string;
-  message: {
-    shortUrl: string;
-  };
-}
+export type CreateAppLinkResponse =
+  | {
+      status: string;
+      data: string;
+      message: {
+        shortUrl: string;
+      };
+    }
+  | {
+      status: string;
+      message: string;
+    }
+  | {
+      error: string;
+    };

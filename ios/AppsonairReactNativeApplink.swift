@@ -93,10 +93,10 @@ class AppsonairReactNativeApplink: RCTEventEmitter {
 
     let shortId = params["shortId"] as? String ?? ""
 
-    let socialMeta: [String: String] = [
-      "title": params["metaTitle"] as? String ?? "",
-      "description": params["metaDescription"] as? String ?? "",
-      "imageUrl": params["metaImageUrl"] as? String ?? ""
+    let socialMeta: [String: String?] = [
+      "title": (params["metaTitle"] as? String).flatMap { $0.isEmpty ? nil : $0 },
+      "description": (params["metaDescription"] as? String).flatMap { $0.isEmpty ? nil : $0 },
+      "imageUrl": (params["metaImageUrl"] as? String).flatMap { $0.isEmpty ? nil : $0 }
     ]
 
     let isOpenInBrowserApple = params["isOpenInBrowserApple"] as? Bool ?? false

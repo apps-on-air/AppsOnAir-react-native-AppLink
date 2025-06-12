@@ -16,6 +16,7 @@ import {
   onDeepLinkProcessed,
   getReferralDetails,
   type AppLinkParams,
+  type CreateAppLinkResponse,
 } from 'appsonair-react-native-applink';
 
 const App = () => {
@@ -48,15 +49,28 @@ const App = () => {
 
   const handleCreateLink = async () => {
     try {
-      const result = await createAppLink(linkParams);
-      if (result?.status !== 'SUCCESS') {
-        throw new Error(result.message.shortUrl || 'Failed to create link');
+      const result: CreateAppLinkResponse = await createAppLink(linkParams);
+
+      if ('error' in result) {
+        throw new Error(result.error);
       }
-      Alert.alert(
-        'App Link Created',
-        result.message?.shortUrl ?? 'No link returned'
-      );
+
+      if (result.status !== 'SUCCESS') {
+        const errorMessage =
+          typeof result.message === 'string'
+            ? result.message
+            : 'Failed to create link';
+        throw new Error(errorMessage);
+      }
+
+      const shortUrl =
+        typeof result.message === 'object'
+          ? result.message.shortUrl
+          : 'No link returned';
+
+      Alert.alert('AppLink Created', shortUrl);
     } catch (err: any) {
+      console.log(err);
       Alert.alert('Error Creating Link', err.message || 'Unknown error');
     }
   };
