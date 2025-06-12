@@ -58,11 +58,21 @@ class AppsonairReactNativeApplinkModule(reactContext: ReactApplicationContext) :
 
   @ReactMethod
   fun createAppLink(params: ReadableMap, promise: Promise) {
-    val socialMeta = mapOf(
-      "title" to params.getString("metaTitle")?.takeIf { it.isNotEmpty() },
-      "description" to params.getString("metaDescription")?.takeIf { it.isNotEmpty() },
-      "imageUrl" to params.getString("metaImageUrl")?.takeIf { it.isNotEmpty() }
-    )
+    val title = params.getString("metaTitle")?.takeIf { it.isNotEmpty() }
+    val description = params.getString("metaDescription")?.takeIf { it.isNotEmpty() }
+    val imageUrl = params.getString("metaImageUrl")?.takeIf { it.isNotEmpty() }
+
+    val allNull = title == null && description == null && imageUrl == null
+
+    val socialMeta: Map<String, Any>? = if (allNull) {
+      null
+    } else {
+      mapOf(
+        "title" to (title ?: JSONObject.NULL),
+        "description" to (description ?: JSONObject.NULL),
+        "imageUrl" to (imageUrl ?: JSONObject.NULL)
+      )
+    }
 
     CoroutineScope(Dispatchers.Main).launch {
       try {

@@ -93,15 +93,23 @@ class AppsonairReactNativeApplink: RCTEventEmitter {
 
     let shortId = params["shortId"] as? String ?? ""
 
-    let socialMeta: [String: String?] = [
-      "title": (params["metaTitle"] as? String).flatMap { $0.isEmpty ? nil : $0 },
-      "description": (params["metaDescription"] as? String).flatMap { $0.isEmpty ? nil : $0 },
-      "imageUrl": (params["metaImageUrl"] as? String).flatMap { $0.isEmpty ? nil : $0 }
-    ]
+    let title = (params["metaTitle"] as? String).flatMap { $0.isEmpty ? nil : $0 }
+    let description = (params["metaDescription"] as? String).flatMap { $0.isEmpty ? nil : $0 }
+    let imageUrl = (params["metaImageUrl"] as? String).flatMap { $0.isEmpty ? nil : $0 }
+
+    var socialMeta: [String: String?]? = nil
+
+    if title != nil || description != nil || imageUrl != nil {
+      socialMeta = [
+        "title": title,
+        "description": description,
+        "imageUrl": imageUrl
+      ]
+    }
 
     let isOpenInBrowserApple = params["isOpenInBrowserApple"] as? Bool ?? false
     let isOpenInIosApp = params["isOpenInIosApp"] as? Bool ?? true
-      let iOSFallbackUrl = params["iOSFallbackUrl"] as? String ?? ""
+    let iOSFallbackUrl = params["iOSFallbackUrl"] as? String ?? ""
 
     let isOpenInBrowserAndroid = params["isOpenInBrowserAndroid"] as? Bool ?? false
     let isOpenInAndroidApp = params["isOpenInAndroidApp"] as? Bool ?? true
