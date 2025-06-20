@@ -129,13 +129,13 @@ class AppsonairReactNativeApplinkModule(reactContext: ReactApplicationContext) :
     }
   }
 
-  override fun onNewIntent(intent: Intent?) {
+  override fun onNewIntent(intent: Intent) {
     intent?.let {
       deeplinkService?.handleDeepLink(it, context.packageName)
     }
   }
 
-  override fun onActivityResult(activity: Activity?, requestCode: Int, resultCode: Int, data: Intent?) {
+  override fun onActivityResult(activity: Activity, requestCode: Int, resultCode: Int, data: Intent?) {
     // No-op
   }
 
