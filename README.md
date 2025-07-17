@@ -4,10 +4,6 @@
 
 **AppsOnAir-react-native-AppLink** enables seamless handling of deep links and in-app routing within your React Native app. With simple integration, you can configure, manage, and act on links directly from the web dashboard in real time. For more details, refer to the [documentation](https://documentation.appsonair.com/MobileQuickstart/GettingStarted/).
 
-## ⚠️ Important Notice ⚠️
-
-This plugin is currently in pre-production. While the plugin is fully functional, the supported services it integrates with are not yet live in production. Stay tuned for updates as we bring our services to production!
-
 ## 🚀 Features
 
 - ✅ Deep link support (URI schemes and App Links)
