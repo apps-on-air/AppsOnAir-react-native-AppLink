@@ -1,5 +1,9 @@
 ## 1.0.0
 
+- Readme file updated.
+
+## 1.0.0
+
 - Initial stable release.
 
 ## 0.1.1
