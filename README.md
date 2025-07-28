@@ -9,7 +9,7 @@
 - ✅ Deep link support (URI schemes and App Links)
 - ✅ Fallback behavior (e.g., open Play Store or App Store)
 - ✅ Custom domain support
-- ✅ Firebase Dynamic Links migration to AppLink _(Coming Soon)_
+- ✅ Firebase Dynamic Links migration to AppLink
 
 ## Minimum Requirements
 
