@@ -23,7 +23,7 @@ export type CreateAppLinkResponse =
       };
     }
   | {
-      status: string;
+      statusCode: number;
       message: string;
     }
   | {
