@@ -1,4 +1,8 @@
-## 1.0.0
+## 1.0.2
+
+- Fix Type issue for CreateAppLinkResponse
+
+## 1.0.1
 
 - Readme file updated.
 
