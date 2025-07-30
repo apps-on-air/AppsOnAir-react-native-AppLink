@@ -91,7 +91,7 @@ class AppsonairReactNativeApplink: RCTEventEmitter {
       return
     }
 
-    let shortId = params["shortId"] as? String ?? ""
+    let shortId = params["shortId"] is NSNull ? nil : params["shortId"] as? String
 
     let title = (params["metaTitle"] as? String).flatMap { $0.isEmpty ? nil : $0 }
     let description = (params["metaDescription"] as? String).flatMap { $0.isEmpty ? nil : $0 }
