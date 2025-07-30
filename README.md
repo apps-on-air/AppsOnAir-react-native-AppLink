@@ -290,7 +290,7 @@ const App = () => {
         throw new Error(result.error);
       }
 
-      if (result.status !== 'SUCCESS') {
+      if ('status' in result && result.status !== 'SUCCESS') {
         throw new Error(result.message);
       }
 
@@ -299,7 +299,9 @@ const App = () => {
 
         Alert.alert('AppLink Created', shortUrl);
       } else {
-        throw new Error('No data returned from createAppLink');
+        throw new Error(
+          result.message ?? 'No data returned from createAppLink'
+        );
       }
     } catch (err: any) {
       console.log(err);
