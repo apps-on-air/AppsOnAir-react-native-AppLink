@@ -17,13 +17,13 @@ export type AppLinkParams = {
 export type CreateAppLinkResponse =
   | {
       status: string;
-      data: string;
-      message: {
+      message: string;
+      data: {
         shortUrl: string;
       };
     }
   | {
-      status: string;
+      statusCode: number;
       message: string;
     }
   | {
