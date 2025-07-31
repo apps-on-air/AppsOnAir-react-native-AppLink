@@ -270,9 +270,6 @@ const App = () => {
     name: '',
     url: '',
     urlPrefix: '', // Replace with your actual domain prefix
-    metaTitle: '',
-    metaDescription: '',
-    metaImageUrl: '',
     iOSFallbackUrl: '',
     androidFallbackUrl: '',
     shortId: '',
