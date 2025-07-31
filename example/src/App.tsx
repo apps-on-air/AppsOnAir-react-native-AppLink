@@ -25,9 +25,6 @@ const App = () => {
     name: '',
     url: '',
     urlPrefix: '',
-    metaTitle: '',
-    metaDescription: '',
-    metaImageUrl: '',
     iOSFallbackUrl: '',
     androidFallbackUrl: '',
     shortId: '',
@@ -122,17 +119,6 @@ const App = () => {
         {renderTextInput('Name', linkParams.name, 'name')}
         {renderTextInput('URL', linkParams.url, 'url')}
         {renderTextInput('URL Prefix', linkParams.urlPrefix, 'urlPrefix')}
-        {renderTextInput('Meta Title', linkParams.metaTitle || '', 'metaTitle')}
-        {renderTextInput(
-          'Meta Description',
-          linkParams.metaDescription || '',
-          'metaDescription'
-        )}
-        {renderTextInput(
-          'Meta Image URL',
-          linkParams.metaImageUrl || '',
-          'metaImageUrl'
-        )}
         {renderTextInput(
           'iOS Fallback URL',
           linkParams.iOSFallbackUrl || '',
