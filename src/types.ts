@@ -3,9 +3,11 @@ export type AppLinkParams = {
   name: string;
   urlPrefix: string;
   shortId?: string;
-  metaTitle?: string;
-  metaDescription?: string;
-  metaImageUrl?: string;
+  socialMeta?: {
+    title?: string;
+    description?: string;
+    imageUrl?: string;
+  };
   isOpenInBrowserAndroid?: boolean;
   isOpenInAndroidApp?: boolean;
   androidFallbackUrl?: string;
