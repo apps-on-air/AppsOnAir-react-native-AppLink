@@ -1,3 +1,10 @@
+## 1.1.0
+
+- Parameters have been standardized to camelCase across the project.
+- SocialMeta params will now be an object.
+- Example usage has been updated for clarity and consistency.
+- README.md has been improved to reflect the latest changes and usage patterns.
+
 ## 1.0.2
 
 - Fix Type issue for CreateAppLinkResponse

@@ -25,10 +25,7 @@ const App = () => {
     name: '',
     url: '',
     urlPrefix: '',
-    metaTitle: '',
-    metaDescription: '',
-    metaImageUrl: '',
-    iOSFallbackUrl: '',
+    iosFallbackUrl: '',
     androidFallbackUrl: '',
     shortId: '',
     isOpenInAndroidApp: true,
@@ -55,20 +52,19 @@ const App = () => {
         throw new Error(result.error);
       }
 
-      if (result.status !== 'SUCCESS') {
-        const errorMessage =
-          typeof result.message === 'string'
-            ? result.message
-            : 'Failed to create link';
-        throw new Error(errorMessage);
+      if ('status' in result && result.status !== 'SUCCESS') {
+        throw new Error(result.message);
       }
 
-      const shortUrl =
-        typeof result.message === 'object'
-          ? result.message.shortUrl
-          : 'No link returned';
+      if ('data' in result) {
+        const shortUrl = result.data.shortUrl;
 
-      Alert.alert('AppLink Created', shortUrl);
+        Alert.alert('AppLink Created', shortUrl);
+      } else {
+        throw new Error(
+          result.message ?? 'No data returned from createAppLink'
+        );
+      }
     } catch (err: any) {
       console.log(err);
       Alert.alert('Error Creating Link', err.message || 'Unknown error');
@@ -123,21 +119,10 @@ const App = () => {
         {renderTextInput('Name', linkParams.name, 'name')}
         {renderTextInput('URL', linkParams.url, 'url')}
         {renderTextInput('URL Prefix', linkParams.urlPrefix, 'urlPrefix')}
-        {renderTextInput('Meta Title', linkParams.metaTitle || '', 'metaTitle')}
-        {renderTextInput(
-          'Meta Description',
-          linkParams.metaDescription || '',
-          'metaDescription'
-        )}
-        {renderTextInput(
-          'Meta Image URL',
-          linkParams.metaImageUrl || '',
-          'metaImageUrl'
-        )}
         {renderTextInput(
           'iOS Fallback URL',
-          linkParams.iOSFallbackUrl || '',
-          'iOSFallbackUrl'
+          linkParams.iosFallbackUrl || '',
+          'iosFallbackUrl'
         )}
         {renderTextInput(
           'Android Fallback URL',

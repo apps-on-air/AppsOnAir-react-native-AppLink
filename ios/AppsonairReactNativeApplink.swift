@@ -91,7 +91,7 @@ class AppsonairReactNativeApplink: RCTEventEmitter {
       return
     }
 
-    let shortId = params["shortId"] as? String ?? ""
+    let shortId = params["shortId"] is NSNull ? nil : params["shortId"] as? String
 
     let title = (params["metaTitle"] as? String).flatMap { $0.isEmpty ? nil : $0 }
     let description = (params["metaDescription"] as? String).flatMap { $0.isEmpty ? nil : $0 }
@@ -109,7 +109,7 @@ class AppsonairReactNativeApplink: RCTEventEmitter {
 
     let isOpenInBrowserApple = params["isOpenInBrowserApple"] as? Bool ?? false
     let isOpenInIosApp = params["isOpenInIosApp"] as? Bool ?? true
-    let iOSFallbackUrl = params["iOSFallbackUrl"] as? String ?? ""
+    let iosFallbackUrl = params["iosFallbackUrl"] as? String ?? ""
 
     let isOpenInBrowserAndroid = params["isOpenInBrowserAndroid"] as? Bool ?? false
     let isOpenInAndroidApp = params["isOpenInAndroidApp"] as? Bool ?? true
@@ -123,7 +123,7 @@ class AppsonairReactNativeApplink: RCTEventEmitter {
       socialMeta: socialMeta,
       isOpenInBrowserApple: isOpenInBrowserApple,
       isOpenInIosApp: isOpenInIosApp,
-      iOSFallbackUrl: iOSFallbackUrl,
+      iosFallbackUrl: iosFallbackUrl,
       isOpenInAndroidApp: isOpenInAndroidApp,
       isOpenInBrowserAndroid: isOpenInBrowserAndroid,
       androidFallbackUrl: androidFallbackUrl
@@ -131,7 +131,7 @@ class AppsonairReactNativeApplink: RCTEventEmitter {
       if let status = linkInfo["status"] as? String, status == "SUCCESS" {
         resolve(linkInfo)
       } else {
-        let message = linkInfo["message"] as? String ?? "Unknown error"
+        let message = linkInfo["message"] as? String ?? linkInfo["error"] as? String ?? "Unknown error"
         let code = linkInfo["statusCode"] as? Int ?? 500
         reject("CREATE_FAILED", message, NSError(domain: "", code: code))
       }
