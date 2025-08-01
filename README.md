@@ -11,6 +11,22 @@
 - ✅ Custom domain support
 - ✅ Seamless firebase dynamic link migration to AppLink
 
+## Installation
+
+Install the **AppsOnAir React Native AppLink** package using `npm`:
+
+```sh
+npm install appsOnAir-react-native-appLink
+```
+
+After installation, navigate to your iOS project directory and install the native dependencies using CocoaPods:
+
+```sh
+cd ios
+pod install
+cd ..
+```
+
 ## Minimum Requirements
 
 ### Android
@@ -25,12 +41,12 @@
 
 ## Android Setup
 
-### Adding Application ID in AndroidManifest.xml
+### Adding API Key in AndroidManifest.xml
 
 Add the following `<meta-data>` tag to your application’s AndroidManifest.xml file inside the `<application>` tag:
 
 - Make sure the `android:name` is set to "appId"
-- Replace the `android:value` with your actual Application ID provided by AppsOnAir
+- Replace the `android:value` with your actual API Key provided by AppsOnAir
 
 ```xml
 </application>
@@ -113,9 +129,9 @@ class MainActivity : ReactActivity() {
 
 ## iOS Setup
 
-### Adding Application ID in Info.plist
+### Adding API Key in Info.plist
 
-- Replace the `<string>` value with your actual AppsOnAir Application ID
+- Replace the `<string>` value with your actual AppsOnAir API Key
 
 ```xml
 <key>AppsOnAirAPIKey</key>
@@ -127,6 +143,7 @@ class MainActivity : ReactActivity() {
 To support **Universal Links**, create or edit the `YOUR_PROJECT.entitlements` file and add the following configuration:
 
 ```xml
+<!-- If Using Universal Links -->
 <key>com.apple.developer.associated-domains</key>
 <array>
     <string>applinks:YOUR_DOMAIN</string> <!-- Replace with your actual domain -->
@@ -138,6 +155,7 @@ To support **Universal Links**, create or edit the `YOUR_PROJECT.entitlements` f
 To support a **Custom URL Scheme**, add the following to your app’s `Info.plist` file:
 
 ```xml
+<!-- If Using Custom Url Schema -->
 <key>CFBundleURLTypes</key>
 <array>
     <dict>
@@ -145,7 +163,7 @@ To support a **Custom URL Scheme**, add the following to your app’s `Info.plis
         <string>YOUR_URL_NAME</string>
         <key>CFBundleURLSchemes</key>
         <array>
-            <string>YOUR_CUSTOM_URL_SCHEME</string> <!-- Replace with your custom URL scheme -->
+          <string>YOUR_CUSTOM_URL_SCHEME</string> <!-- Replace with your custom URL scheme -->
         </array>
     </dict>
 </array>
@@ -158,42 +176,30 @@ To support a **Custom URL Scheme**, add the following to your app’s `Info.plis
 To handle both Universal Links and Custom URL Schemes, add the following methods to your `AppDelegate.swift` file:
 
 ```swift
+// Step 1: Import AppsOnAir_AppLink
 import AppsOnAir_AppLink
 ...
 
-  var window: UIWindow?
-  let appOnAirLinkService = AppLinkService.shared
-  ...
+// Step 2: AppLink Class instance create
+var window: UIWindow?
+let appOnAirLinkService = AppLinkService.shared
+...
 
+    // Step 3: Handle AppLink Service
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
-    guard userActivity.activityType == NSUserActivityTypeBrowsingWeb,
-            let url = userActivity.webpageURL else {
-        return false
-    }
-    appOnAirLinkService.handleAppLink(incomingURL: url)
-    return true
+        guard userActivity.activityType == NSUserActivityTypeBrowsingWeb,
+        let url = userActivity.webpageURL else {
+            return false
+        }
+        appOnAirLinkService.handleAppLink(incomingURL: url)
+        return true
     }
 
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-    appOnAirLinkService.handleAppLink(incomingURL: url)
-    return true
+        appOnAirLinkService.handleAppLink(incomingURL: url)
+        return true
     }
-```
 
-## Installation
-
-Install the **AppsOnAir React Native AppLink** package using `npm`:
-
-```sh
-npm install appsOnAir-react-native-appLink
-```
-
-After installation, navigate to your iOS project directory and install the native dependencies using CocoaPods:
-
-```sh
-cd ios
-pod install
-cd ..
 ```
 
 ## Usage
@@ -201,8 +207,6 @@ cd ..
 ### Function 1: Initialize App Link
 
 Before handling any deep links, you need to initialize the AppsOnAir AppLink SDK. This is typically done in your app’s entry point — such as inside a top-level component or during app startup.
-
-#### Example (Using useEffect in a functional component)
 
 ```tsx
 import React, { useEffect } from 'react';
@@ -222,7 +226,7 @@ const App = () => {
 
 ### Function 2: Listen for Deep Link Events
 
-Use `onDeepLinkProcessed` to listen for incoming deep links after initialization. This allows you to respond to navigation events or extract data from the link.
+Use `onDeepLinkProcessed` to listen for incoming deep links after **initialization**. This allows you to respond to navigation events or extract data from the link.
 
 ```tsx
 import React, { useEffect } from 'react';
@@ -254,7 +258,7 @@ const App = () => {
 
 ### Function 3: Create a New App Link
 
-Use `createAppLink` to programmatically generate a new App Link from your React Native app by passing a structured set of parameters.
+Use `createAppLink` to programmatically generate a **New App Link** from your React Native app by passing a structured set of parameters.
 
 ```tsx
 import React, { useState } from 'react';
@@ -270,7 +274,7 @@ const App = () => {
     name: '',
     url: '',
     urlPrefix: '', // Replace with your actual domain prefix
-    iOSFallbackUrl: '',
+    iosFallbackUrl: '',
     androidFallbackUrl: '',
     shortId: '',
     isOpenInAndroidApp: true,
