@@ -131,7 +131,7 @@ class AppsonairReactNativeApplink: RCTEventEmitter {
       if let status = linkInfo["status"] as? String, status == "SUCCESS" {
         resolve(linkInfo)
       } else {
-        let message = linkInfo["message"] as? String ?? "Unknown error"
+        let message = linkInfo["message"] as? String ?? linkInfo["error"] as? String ?? "Unknown error"
         let code = linkInfo["statusCode"] as? Int ?? 500
         reject("CREATE_FAILED", message, NSError(domain: "", code: code))
       }
