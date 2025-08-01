@@ -109,7 +109,7 @@ class AppsonairReactNativeApplink: RCTEventEmitter {
 
     let isOpenInBrowserApple = params["isOpenInBrowserApple"] as? Bool ?? false
     let isOpenInIosApp = params["isOpenInIosApp"] as? Bool ?? true
-    let iOSFallbackUrl = params["iOSFallbackUrl"] as? String ?? ""
+    let iosFallbackUrl = params["iosFallbackUrl"] as? String ?? ""
 
     let isOpenInBrowserAndroid = params["isOpenInBrowserAndroid"] as? Bool ?? false
     let isOpenInAndroidApp = params["isOpenInAndroidApp"] as? Bool ?? true
@@ -123,7 +123,7 @@ class AppsonairReactNativeApplink: RCTEventEmitter {
       socialMeta: socialMeta,
       isOpenInBrowserApple: isOpenInBrowserApple,
       isOpenInIosApp: isOpenInIosApp,
-      iOSFallbackUrl: iOSFallbackUrl,
+      iosFallbackUrl: iosFallbackUrl,
       isOpenInAndroidApp: isOpenInAndroidApp,
       isOpenInBrowserAndroid: isOpenInBrowserAndroid,
       androidFallbackUrl: androidFallbackUrl

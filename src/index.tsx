@@ -58,7 +58,7 @@ export const createAppLink = async ({
   androidFallbackUrl = '',
   isOpenInBrowserApple = false,
   isOpenInIosApp = true,
-  iOSFallbackUrl = '',
+  iosFallbackUrl = '',
 }: AppLinkParams): Promise<CreateAppLinkResponse> => {
   const result = await AppsonairReactNativeApplink.createAppLink({
     url,
@@ -73,7 +73,7 @@ export const createAppLink = async ({
     androidFallbackUrl,
     isOpenInBrowserApple,
     isOpenInIosApp,
-    iOSFallbackUrl,
+    iosFallbackUrl,
   });
 
   if (typeof result === 'string') {

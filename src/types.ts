@@ -13,7 +13,7 @@ export type AppLinkParams = {
   androidFallbackUrl?: string;
   isOpenInBrowserApple?: boolean;
   isOpenInIosApp?: boolean;
-  iOSFallbackUrl?: string;
+  iosFallbackUrl?: string;
 };
 
 export type CreateAppLinkResponse =

@@ -87,7 +87,7 @@ class AppsonairReactNativeApplinkModule(reactContext: ReactApplicationContext) :
           androidFallbackUrl = params.getString("androidFallbackUrl") ?: "",
           isOpenInBrowserApple = params.getBoolean("isOpenInBrowserApple"),
           isOpenInIosApp = params.getBoolean("isOpenInIosApp"),
-          iOSFallbackUrl = params.getString("iOSFallbackUrl") ?: "",
+          iosFallbackUrl = params.getString("iosFallbackUrl") ?: "",
         )
         promise.resolve(result?.toString())
       } catch (e: Exception) {

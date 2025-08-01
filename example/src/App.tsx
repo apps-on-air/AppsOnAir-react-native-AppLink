@@ -25,7 +25,7 @@ const App = () => {
     name: '',
     url: '',
     urlPrefix: '',
-    iOSFallbackUrl: '',
+    iosFallbackUrl: '',
     androidFallbackUrl: '',
     shortId: '',
     isOpenInAndroidApp: true,
@@ -121,8 +121,8 @@ const App = () => {
         {renderTextInput('URL Prefix', linkParams.urlPrefix, 'urlPrefix')}
         {renderTextInput(
           'iOS Fallback URL',
-          linkParams.iOSFallbackUrl || '',
-          'iOSFallbackUrl'
+          linkParams.iosFallbackUrl || '',
+          'iosFallbackUrl'
         )}
         {renderTextInput(
           'Android Fallback URL',
