@@ -80,14 +80,14 @@ class AppsonairReactNativeApplinkModule(reactContext: ReactApplicationContext) :
           url = params.getString("url") ?: "",
           name = params.getString("name") ?: "",
           urlPrefix = params.getString("urlPrefix") ?: "",
-          shortId = params.getString("shortId") ?: "",
+          shortId = if (params.hasKey("shortId") && !params.isNull("shortId")) params.getString("shortId") else null,
           socialMeta = socialMeta,
-          isOpenInBrowserAndroid = params.getBoolean("isOpenInBrowserAndroid") ?: false,
-          isOpenInAndroidApp = params.getBoolean("isOpenInAndroidApp") ?: true,
+          isOpenInBrowserAndroid = params.getBoolean("isOpenInBrowserAndroid"),
+          isOpenInAndroidApp = params.getBoolean("isOpenInAndroidApp"),
           androidFallbackUrl = params.getString("androidFallbackUrl") ?: "",
-          isOpenInBrowserApple = params.getBoolean("isOpenInBrowserApple") ?: false,
-          isOpenInIosApp = params.getBoolean("isOpenInIosApp") ?: true,
-          iOSFallbackUrl = params.getString("iOSFallbackUrl") ?: "",
+          isOpenInBrowserApple = params.getBoolean("isOpenInBrowserApple"),
+          isOpenInIosApp = params.getBoolean("isOpenInIosApp"),
+          iosFallbackUrl = params.getString("iosFallbackUrl") ?: "",
         )
         promise.resolve(result?.toString())
       } catch (e: Exception) {
