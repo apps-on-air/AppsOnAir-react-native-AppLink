@@ -7,7 +7,7 @@ import AppsOnAir_AppLink
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
   var window: UIWindow?
-  let appOnAirLinkService = AppLinkService.shared
+  let appLinkService = AppLinkService.shared
 
   var reactNativeDelegate: ReactNativeDelegate?
   var reactNativeFactory: RCTReactNativeFactory?
@@ -39,12 +39,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let url = userActivity.webpageURL else {
       return false
     }
-    appOnAirLinkService.handleAppLink(incomingURL: url)
+    appLinkService.handleAppLink(incomingURL: url)
     return true
   }
 
   func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-    appOnAirLinkService.handleAppLink(incomingURL: url)
+    appLinkService.handleAppLink(incomingURL: url)
     return true
   }
 }

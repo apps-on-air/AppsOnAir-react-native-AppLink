@@ -18,7 +18,7 @@ class AppsonairReactNativeApplink: RCTEventEmitter {
     return true
   }
 
-  private let appOnAirLinkService = AppLinkService.shared
+  private let appLinkService = AppLinkService.shared
 
   @objc override func addListener(_ eventName: String) {
     super.addListener(eventName)
@@ -54,7 +54,7 @@ class AppsonairReactNativeApplink: RCTEventEmitter {
   func initialize(resolve: @escaping RCTPromiseResolveBlock,
                   reject: @escaping RCTPromiseRejectBlock) {
     DispatchQueue.main.async {
-      self.appOnAirLinkService.initialize { url, linkInfo in
+      self.appLinkService.initialize { url, linkInfo in
         if let url = url {
           let eventData: [String: Any] = [
             "url": url.absoluteString,
@@ -115,7 +115,7 @@ class AppsonairReactNativeApplink: RCTEventEmitter {
     let isOpenInAndroidApp = params["isOpenInAndroidApp"] as? Bool ?? true
     let androidFallbackUrl = params["androidFallbackUrl"] as? String ?? ""
 
-    appOnAirLinkService.createAppLink(
+    appLinkService.createAppLink(
       url: url,
       name: name,
       urlPrefix: urlPrefix,
@@ -143,7 +143,7 @@ class AppsonairReactNativeApplink: RCTEventEmitter {
     resolve: @escaping RCTPromiseResolveBlock,
     reject: @escaping RCTPromiseRejectBlock
   ) {
-    appOnAirLinkService.getReferralDetails { linkInfo in
+    appLinkService.getReferralDetails { linkInfo in
       resolve(linkInfo)
     }
   }
