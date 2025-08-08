@@ -41,8 +41,8 @@ export const initializeAppLink = async (): Promise<boolean> => {
 };
 
 /**
- * Creates a new app link using the provided parameters.
- * The resulting app link can be used to navigate to specific content within the app.
+ * Creates a new AppLink using the provided parameters.
+ * The resulting AppLink can be used to navigate to specific content within the app.
  *
  * @param {AppLinkParams} params - Parameters used to generate the deep link.
  * @returns {Promise<CreateAppLinkResponse>} A promise that resolves to the generated deep link URL, or `null` if creation fails.

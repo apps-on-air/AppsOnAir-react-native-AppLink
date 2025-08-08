@@ -1,3 +1,7 @@
+## 1.1.1
+
+- Documentation Update
+
 ## 1.1.0
 
 - Parameters have been standardized to camelCase across the project.
