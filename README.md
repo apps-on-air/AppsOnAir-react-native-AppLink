@@ -6,10 +6,12 @@
 
 ## 🚀 Features
 
-- ✅ Deep link support (URI schemes and App Links)
+- ✅ Deep link support (URI schemes and AppLinks)
 - ✅ Fallback behavior (e.g., open Play Store or App Store)
 - ✅ Custom domain support
-- ✅ Seamless firebase dynamic link migration to AppLink
+- ✅ Seamless migration from Firebase Dynamic Links to AppLink
+
+**Note:** For comprehensive instructions on migrating Firebase Dynamic Links to AppLinks, refer to the [documentation](https://documentation.appsonair.com/MobileQuickstart/AppLink/firebase-dynamiclinks-migration).
 
 ## Installation
 
@@ -182,7 +184,7 @@ import AppsOnAir_AppLink
 
 // Step 2: AppLink Class instance create
 var window: UIWindow?
-let appOnAirLinkService = AppLinkService.shared
+let appLinkService = AppLinkService.shared
 ...
 
     // Step 3: Handle AppLink Service
@@ -191,12 +193,12 @@ let appOnAirLinkService = AppLinkService.shared
         let url = userActivity.webpageURL else {
             return false
         }
-        appOnAirLinkService.handleAppLink(incomingURL: url)
+        appLinkService.handleAppLink(incomingURL: url)
         return true
     }
 
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-        appOnAirLinkService.handleAppLink(incomingURL: url)
+        appLinkService.handleAppLink(incomingURL: url)
         return true
     }
 
@@ -204,7 +206,7 @@ let appOnAirLinkService = AppLinkService.shared
 
 ## Usage
 
-### Function 1: Initialize App Link
+### Function 1: Initialize AppLink
 
 Before handling any deep links, you need to initialize the AppsOnAir AppLink SDK. This is typically done in your app’s entry point — such as inside a top-level component or during app startup.
 
@@ -214,7 +216,7 @@ import { initializeAppLink } from 'appsonair-react-native-applink';
 
 const App = () => {
   useEffect(() => {
-    // Initialize App Link on app startup
+    // Initialize AppLink on app startup
     initializeAppLink();
   }, []);
 
@@ -256,9 +258,9 @@ const App = () => {
 };
 ```
 
-### Function 3: Create a New App Link
+### Function 3: Create a New AppLink
 
-Use `createAppLink` to programmatically generate a **New App Link** from your React Native app by passing a structured set of parameters.
+Use `createAppLink` to programmatically generate a **New AppLink** from your React Native app by passing a structured set of parameters.
 
 ```tsx
 import React, { useState } from 'react';
@@ -317,7 +319,7 @@ const App = () => {
         value={linkParams.url}
         onChangeText={(text) => setLinkParams({ ...linkParams, url: text })}
       />
-      <Button title="Create App Link" onPress={handleCreateLink} />
+      <Button title="Create AppLink" onPress={handleCreateLink} />
     </View>
   );
 };

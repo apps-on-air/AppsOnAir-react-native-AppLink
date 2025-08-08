@@ -15,7 +15,7 @@ class AppsonairReactNativeApplinkModule(reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext), ActivityEventListener {
 
   private val context = reactContext
-  private var deeplinkService: AppLinkService? = null
+  private var appLinkService: AppLinkService? = null
   private var pendingIntent: Intent? = null
 
   init {
@@ -30,8 +30,8 @@ class AppsonairReactNativeApplinkModule(reactContext: ReactApplicationContext) :
   fun initialize(promise: Promise) {
     val activity = currentActivity ?: return promise.reject("NO_ACTIVITY", "Activity is null")
 
-    deeplinkService = AppLinkService.getInstance(activity)
-    deeplinkService?.initialize(context, activity.intent, object : AppLinkListener {
+    appLinkService = AppLinkService.getInstance(activity)
+    appLinkService?.initialize(context, activity.intent, object : AppLinkListener {
       override fun onDeepLinkProcessed(uri: Uri, result: JSONObject) {
         sendEvent("onDeepLinkProcessed", Arguments.fromBundle(Bundle().apply {
           putString("url", uri.toString())
@@ -49,7 +49,7 @@ class AppsonairReactNativeApplinkModule(reactContext: ReactApplicationContext) :
 
     // Handle any pending intent if it arrived before init
     pendingIntent?.let {
-      deeplinkService?.handleDeepLink(it, context.packageName)
+      appLinkService?.handleDeepLink(it, context.packageName)
       pendingIntent = null
     }
 
@@ -76,7 +76,7 @@ class AppsonairReactNativeApplinkModule(reactContext: ReactApplicationContext) :
 
     CoroutineScope(Dispatchers.Main).launch {
       try {
-        val result = deeplinkService?.createAppLink(
+        val result = appLinkService?.createAppLink(
           url = params.getString("url") ?: "",
           name = params.getString("name") ?: "",
           urlPrefix = params.getString("urlPrefix") ?: "",
@@ -99,7 +99,7 @@ class AppsonairReactNativeApplinkModule(reactContext: ReactApplicationContext) :
   @ReactMethod
   fun getReferralDetails(promise: Promise) {
     try {
-      val referral = deeplinkService?.getReferralDetails()
+      val referral = appLinkService?.getReferralDetails()
       if (referral != null) {
         val referralMap = Arguments.createMap()
         referral.keys().forEach { key ->
@@ -122,8 +122,8 @@ class AppsonairReactNativeApplinkModule(reactContext: ReactApplicationContext) :
   }
 
   fun handleIntent(intent: Intent) {
-    if (deeplinkService != null) {
-      deeplinkService?.handleDeepLink(intent, context.packageName)
+    if (appLinkService != null) {
+      appLinkService?.handleDeepLink(intent, context.packageName)
     } else {
       pendingIntent = intent
     }
@@ -131,7 +131,7 @@ class AppsonairReactNativeApplinkModule(reactContext: ReactApplicationContext) :
 
   override fun onNewIntent(intent: Intent) {
     intent?.let {
-      deeplinkService?.handleDeepLink(it, context.packageName)
+      appLinkService?.handleDeepLink(it, context.packageName)
     }
   }
 

@@ -15,7 +15,7 @@ Pod::Spec.new do |s|
 
   s.source_files = "ios/**/*.{h,m,mm,swift}"
 
-  # AppsOnAir App Link IOS POD
+  # AppsOnAir AppLink IOS POD
   s.dependency 'AppsOnAir-AppLink', '1.1.0'
 
 # Use install_modules_dependencies helper to install the dependencies if React Native version >=0.71.0.

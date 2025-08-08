@@ -155,7 +155,7 @@ const App = () => {
         </View>
 
         <View style={styles.buttonGroup}>
-          <Button title="Create App Link" onPress={handleCreateLink} />
+          <Button title="Create AppLink" onPress={handleCreateLink} />
           <Button
             title="Get Referral Details"
             onPress={handleReferralDetails}
