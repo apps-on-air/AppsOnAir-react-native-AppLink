@@ -1,3 +1,7 @@
+## 1.1.2
+
+- Update native dependency
+
 ## 1.1.1
 
 - Documentation Update
