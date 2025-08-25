@@ -1,3 +1,7 @@
+## 1.1.4
+
+- Added additional information in Referral Details
+
 ## 1.1.3
 
 - @ReactModule crash fix in Android
