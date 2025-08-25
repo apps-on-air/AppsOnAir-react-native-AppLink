@@ -7,10 +7,12 @@ import android.os.Bundle
 import com.appsonair.applink.interfaces.AppLinkListener
 import com.appsonair.applink.services.AppLinkService
 import com.facebook.react.bridge.*
+import com.facebook.react.module.annotations.ReactModule
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import kotlinx.coroutines.*
 import org.json.JSONObject
 
+@ReactModule(name = AppsonairReactNativeApplinkModule.NAME)
 class AppsonairReactNativeApplinkModule(reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext), ActivityEventListener {
 
@@ -28,7 +30,8 @@ class AppsonairReactNativeApplinkModule(reactContext: ReactApplicationContext) :
 
   @ReactMethod
   fun initialize(promise: Promise) {
-    val activity = currentActivity ?: return promise.reject("NO_ACTIVITY", "Activity is null")
+    val activity = reactApplicationContext.currentActivity
+        ?: return promise.reject("NO_ACTIVITY", "Activity is null")
 
     appLinkService = AppLinkService.getInstance(activity)
     appLinkService?.initialize(context, activity.intent, object : AppLinkListener {

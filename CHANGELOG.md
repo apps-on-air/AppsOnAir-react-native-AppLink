@@ -1,3 +1,7 @@
+## 1.1.3
+
+- @ReactModule crash fix in Android
+
 ## 1.1.2
 
 - Update native dependency
