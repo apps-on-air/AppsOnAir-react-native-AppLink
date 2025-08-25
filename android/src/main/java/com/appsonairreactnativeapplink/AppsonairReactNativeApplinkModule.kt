@@ -30,7 +30,8 @@ class AppsonairReactNativeApplinkModule(reactContext: ReactApplicationContext) :
 
   @ReactMethod
   fun initialize(promise: Promise) {
-    val activity = currentActivity ?: return promise.reject("NO_ACTIVITY", "Activity is null")
+    val activity = reactApplicationContext.currentActivity
+        ?: return promise.reject("NO_ACTIVITY", "Activity is null")
 
     appLinkService = AppLinkService.getInstance(activity)
     appLinkService?.initialize(context, activity.intent, object : AppLinkListener {
