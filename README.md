@@ -15,10 +15,14 @@
 
 ## Installation
 
-Install the **AppsOnAir React Native AppLink** package using `npm`:
+Install the **AppsOnAir React Native AppLink** package using `npm` or `yarn`:
 
 ```sh
-npm install appsOnAir-react-native-appLink
+# Using npm
+npm install appsonair-react-native-applink
+
+# Using yarn
+yarn add appsonair-react-native-applink
 ```
 
 After installation, navigate to your iOS project directory and install the native dependencies using CocoaPods:
@@ -45,7 +49,7 @@ cd ..
 
 ### Adding API Key in AndroidManifest.xml
 
-Add the following `<meta-data>` tag to your application’s AndroidManifest.xml file inside the `<application>` tag:
+Add the following `<meta-data>` tag to your application's AndroidManifest.xml file inside the `<application>` tag:
 
 - Make sure the `android:name` is set to "appId"
 - Replace the `android:value` with your actual API Key provided by AppsOnAir
@@ -78,7 +82,7 @@ Add the following `<intent-filter>` inside the `<activity>` tag of your main act
 
 If you're using a custom URI scheme, add this additional `<intent-filter>` block under the same activity:
 
-- Replace **your-domain.com** and **your-scheme** with the custom domain and scheme you’ve defined.
+- Replace **your-domain.com** and **your-scheme** with the custom domain and scheme you've defined.
 
 ```xml
  <intent-filter>
@@ -154,7 +158,7 @@ To support **Universal Links**, create or edit the `YOUR_PROJECT.entitlements` f
 
 > Note: After configuring the Associated Domain for Universal Links, it may take up to 24 hours for the changes to propagate and become active. The setup and verification process is handled by Apple.
 
-To support a **Custom URL Scheme**, add the following to your app’s `Info.plist` file:
+To support a **Custom URL Scheme**, add the following to your app's `Info.plist` file:
 
 ```xml
 <!-- If Using Custom Url Schema -->
@@ -208,7 +212,7 @@ let appLinkService = AppLinkService.shared
 
 ### Function 1: Initialize AppLink
 
-Before handling any deep links, you need to initialize the AppsOnAir AppLink SDK. This is typically done in your app’s entry point — such as inside a top-level component or during app startup.
+Before handling any deep links, you need to initialize the AppsOnAir AppLink SDK. This is typically done in your app's entry point — such as inside a top-level component or during app startup.
 
 ```tsx
 import React, { useEffect } from 'react';
