@@ -1,3 +1,7 @@
+## 1.1.5
+
+- Add Objective-C++ support
+
 ## 1.1.4
 
 - Added additional information in Referral Details
