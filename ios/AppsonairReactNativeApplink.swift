@@ -9,9 +9,10 @@ class AppsonairReactNativeApplink: RCTEventEmitter {
   private var pendingEvents: [[String: Any]] = []
     
   private var pendingDeepLinkEvent: [String: Any]? = nil
+  private var pendingReferralEvent: [String: Any]? = nil
 
   override func supportedEvents() -> [String] {
-    return ["onDeepLinkProcessed", "onDeepLinkError"]
+    return ["onDeepLinkProcessed", "onReferralLinkDetected"]
   }
 
   override static func requiresMainQueueSetup() -> Bool {
@@ -37,6 +38,11 @@ class AppsonairReactNativeApplink: RCTEventEmitter {
       pendingDeepLinkEvent = nil
     }
 
+    if let event = pendingReferralEvent {
+      sendEvent(withName: "onReferralLinkDetected", body: event)
+      pendingReferralEvent = nil
+    }
+
     for event in pendingEvents {
       if let name = event["name"] as? String,
       let body = event["body"] as? [String: Any] {
@@ -54,10 +60,11 @@ class AppsonairReactNativeApplink: RCTEventEmitter {
   func initialize(resolve: @escaping RCTPromiseResolveBlock,
                   reject: @escaping RCTPromiseRejectBlock) {
     DispatchQueue.main.async {
-      self.appLinkService.initialize { url, linkInfo in
+      self.appLinkService.initialize(
+        onDeepLinkProcessed: { url, linkInfo in
         if let url = url {
           let eventData: [String: Any] = [
-            "url": url.absoluteString,
+            "uri": url.absoluteString,
             "result": linkInfo
           ]
           if self.hasListeners {
@@ -66,7 +73,15 @@ class AppsonairReactNativeApplink: RCTEventEmitter {
             self.pendingDeepLinkEvent = eventData
           }
         }
-      }
+      },
+        onReferralLinkDetected: { referralInfo in
+          if self.hasListeners {
+            self.sendEvent(withName: "onReferralLinkDetected", body: referralInfo)
+          } else {
+            self.pendingDeepLinkEvent = referralInfo
+          }
+        }
+      )
     }
     resolve(true)
   }
@@ -144,6 +159,16 @@ class AppsonairReactNativeApplink: RCTEventEmitter {
     reject: @escaping RCTPromiseRejectBlock
   ) {
     appLinkService.getReferralDetails { linkInfo in
+      resolve(linkInfo)
+    }
+  }
+  
+  @objc(getReferralInfo:withRejecter:)
+  func getReferralInfo(
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) {
+    appLinkService.getReferralInfo { linkInfo in
       resolve(linkInfo)
     }
   }

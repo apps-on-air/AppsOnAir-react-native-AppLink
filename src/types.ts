@@ -31,3 +31,19 @@ export type CreateAppLinkResponse =
   | {
       error: string;
     };
+
+export type LinkInfo = {
+  message: string;
+  status: string;
+  data: {
+    link: string;
+    name: string;
+    referralLink: string;
+    shortId: string;
+    socialMetaTags: {
+      description: string;
+      imageUrl: string;
+      title: string;
+    };
+  };
+};

@@ -36,17 +36,18 @@ class AppsonairReactNativeApplinkModule(reactContext: ReactApplicationContext) :
     appLinkService = AppLinkService.getInstance(activity)
     appLinkService?.initialize(context, activity.intent, object : AppLinkListener {
       override fun onDeepLinkProcessed(uri: Uri, result: JSONObject) {
-        sendEvent("onDeepLinkProcessed", Arguments.fromBundle(Bundle().apply {
-          putString("url", uri.toString())
-          putString("result", result.toString())
-        }))
+        val params = Arguments.createMap()
+        params.putString("uri", uri.toString())
+        params.putMap("result", jsonToWritableMap(result))
+        sendEvent("onDeepLinkProcessed", params)
       }
 
       override fun onDeepLinkError(uri: Uri?, error: String) {
-        sendEvent("onDeepLinkError", Arguments.fromBundle(Bundle().apply {
-          putString("url", uri?.toString() ?: "")
-          putString("error", error)
-        }))
+      }
+
+      override fun onReferralLinkDetected(result: JSONObject) {
+        val map = jsonToWritableMap(result)
+        sendEvent("onReferralLinkDetected", map)
       }
     })
 
@@ -57,6 +58,42 @@ class AppsonairReactNativeApplinkModule(reactContext: ReactApplicationContext) :
     }
 
     promise.resolve(true)
+  }
+
+  private fun jsonToWritableMap(json: JSONObject): WritableMap {
+    val map = Arguments.createMap()
+    val keys = json.keys()
+    while (keys.hasNext()) {
+      val key = keys.next()
+      val value = json.opt(key)
+      when (value) {
+        is JSONObject -> map.putMap(key, jsonToWritableMap(value))
+        is org.json.JSONArray -> map.putArray(key, jsonToWritableArray(value))
+        is Boolean -> map.putBoolean(key, value)
+        is Int -> map.putInt(key, value)
+        is Double -> map.putDouble(key, value)
+        is String -> map.putString(key, value)
+        else -> map.putString(key, value?.toString())
+      }
+    }
+    return map
+  }
+
+  private fun jsonToWritableArray(array: org.json.JSONArray): WritableArray {
+    val writableArray = Arguments.createArray()
+    for (i in 0 until array.length()) {
+      val value = array.opt(i)
+      when (value) {
+        is JSONObject -> writableArray.pushMap(jsonToWritableMap(value))
+        is org.json.JSONArray -> writableArray.pushArray(jsonToWritableArray(value))
+        is Boolean -> writableArray.pushBoolean(value)
+        is Int -> writableArray.pushInt(value)
+        is Double -> writableArray.pushDouble(value)
+        is String -> writableArray.pushString(value)
+        else -> writableArray.pushString(value?.toString())
+      }
+    }
+    return writableArray
   }
 
   @ReactMethod
@@ -121,6 +158,34 @@ class AppsonairReactNativeApplinkModule(reactContext: ReactApplicationContext) :
       }
     } catch (e: Exception) {
       promise.reject("REFERRAL_ERROR", e.message, e)
+    }
+  }
+
+  @ReactMethod
+  fun getReferralInfo(promise: Promise) {
+    CoroutineScope(Dispatchers.Main).launch {
+      try {
+        val referral = appLinkService?.getReferralInfo()
+
+        if (referral != null) {
+          val referralMap = Arguments.createMap()
+          referral.keys().forEach { key ->
+            val value = referral.opt(key)
+            when (value) {
+              is String -> referralMap.putString(key, value)
+              is Int -> referralMap.putInt(key, value)
+              is Double -> referralMap.putDouble(key, value)
+              is Boolean -> referralMap.putBoolean(key, value)
+              else -> referralMap.putString(key, value?.toString() ?: "")
+            }
+          }
+        promise.resolve(referralMap)
+      } else {
+        promise.reject("NO_REFERRAL", "No referral details available")
+      }
+      } catch (e: Exception) {
+        promise.reject("REFERRAL_ERROR", e.message, e)
+      }
     }
   }
 
