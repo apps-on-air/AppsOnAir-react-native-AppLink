@@ -256,7 +256,37 @@ const App = () => {
 };
 ```
 
-### Function 3: Create a New AppLink
+### Function 3: Listen for Referral Events
+
+Use `onReferralLinkDetected` to listen for referral detected after **initialization**. This allows you to respond to navigation events or extract data from the link.
+
+```tsx
+import React, { useEffect } from 'react';
+import {
+  initializeAppLink,
+  onReferralLinkDetected
+} from 'appsonair-react-native-applink';
+
+const App = () => {
+  useEffect(() => {
+    initializeAppLink();
+
+    const sub = onReferralLinkDetected((event) => {
+      console.log(`✅ Referral:\n${JSON.stringify(event, null, 2)}`);
+    });
+
+    return () => {
+      sub?.remove();
+    };
+  }, []);
+
+  return (
+    // your UI rendering deepLinkResult
+  );
+};
+```
+
+### Function 4: Create a New AppLink
 
 Use `createAppLink` to programmatically generate a **New AppLink** from your React Native app by passing a structured set of parameters.
 
@@ -323,18 +353,18 @@ const App = () => {
 };
 ```
 
-### Function 4: Get Referral Details
+### Function 5: Get Referral Info
 
-Use `getReferralDetails` to retrieve any referral data passed through a deep link.
+Use `getReferralInfo` to retrieve any referral data passed through a deep link.
 
 ```tsx
 import { Button } from 'react-native';
-import { getReferralDetails } from 'appsonair-react-native-applink';
+import { getReferralInfo } from 'appsonair-react-native-applink';
 
 const App = () => {
   const handleReferralDetails = async () => {
     try {
-      const info = await getReferralDetails();
+      const info = await getReferralInfo();
       console.log('Referral Info', JSON.stringify(info, null, 2));
     } catch (err) {
       console.log('Error', JSON.stringify(err, null, 2));
