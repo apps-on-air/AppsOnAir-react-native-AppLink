@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
   Alert,
+  Button,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -8,19 +9,20 @@ import {
   Text,
   TextInput,
   View,
-  Button,
 } from 'react-native';
 import {
-  initializeAppLink,
   createAppLink,
+  getReferralInfo,
+  initializeAppLink,
   onDeepLinkProcessed,
-  getReferralDetails,
+  onReferralLinkDetected,
   type AppLinkParams,
   type CreateAppLinkResponse,
 } from 'appsonair-react-native-applink';
 
 const App = () => {
   const [deepLinkResult, setDeepLinkResult] = useState('');
+  const [referralLinkResult, setReferralLinkResult] = useState('');
   const [linkParams, setLinkParams] = useState<AppLinkParams>({
     name: '',
     url: '',
@@ -36,11 +38,19 @@ const App = () => {
 
   useEffect(() => {
     initializeAppLink();
-    const sub = onDeepLinkProcessed((event) => {
+    const deepLink = onDeepLinkProcessed((event) => {
+      console.log(`✅ Processed:\n${JSON.stringify(event, null, 2)}`);
       setDeepLinkResult(`✅ Processed:\n${JSON.stringify(event, null, 2)}`);
     });
+
+    const referralLink = onReferralLinkDetected((event) => {
+      console.log(`✅ Referral:\n${JSON.stringify(event, null, 2)}`);
+      setReferralLinkResult(`✅ Referral:\n${JSON.stringify(event, null, 2)}`);
+    });
+
     return () => {
-      sub?.remove();
+      deepLink?.remove();
+      referralLink?.remove();
     };
   }, []);
 
@@ -71,14 +81,13 @@ const App = () => {
     }
   };
 
-  const handleReferralDetails = () => {
-    getReferralDetails()
-      .then((info) => {
-        Alert.alert('Referral Info', JSON.stringify(info, null, 2));
-      })
-      .catch((err) => {
-        Alert.alert('Error', JSON.stringify(err, null, 2));
-      });
+  const handleReferralDetails = async () => {
+    try {
+      const info = await getReferralInfo();
+      Alert.alert('Referral Info', JSON.stringify(info, null, 2));
+    } catch (error) {
+      Alert.alert('Error', JSON.stringify(error, null, 2));
+    }
   };
 
   const renderTextInput = (
@@ -165,6 +174,9 @@ const App = () => {
         <Text style={styles.resultLabel}>Result:</Text>
         <Text style={styles.resultBox}>
           {deepLinkResult || 'Waiting for deep link...'}
+        </Text>
+        <Text style={styles.resultBox}>
+          {referralLinkResult || 'Waiting for deep link...'}
         </Text>
       </ScrollView>
     </SafeAreaView>
