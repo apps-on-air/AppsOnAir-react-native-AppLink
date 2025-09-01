@@ -41,18 +41,18 @@ cd ..
 
 ## Android Setup
 
-### Adding API Key in AndroidManifest.xml
+### Adding AppId in AndroidManifest.xml
 
 Add the following `<meta-data>` tag to your application’s AndroidManifest.xml file inside the `<application>` tag:
 
-- Make sure the `android:name` is set to "appId"
-- Replace the `android:value` with your actual API Key provided by AppsOnAir
+- Make sure the `android:name` is set to "AppsonairAppId"
+- Replace the `android:value` with your actual AppId provided by AppsOnAir
 
 ```xml
 </application>
     ...
     <meta-data
-        android:name="appId"
+        android:name="AppsonairAppId"
         android:value="********-****-****-****-************" />
 </application>
 ```
@@ -129,12 +129,12 @@ class MainActivity : ReactActivity() {
 
 ## iOS Setup
 
-### Adding API Key in Info.plist
+### Adding AppId in Info.plist
 
-- Replace the `<string>` value with your actual AppsOnAir API Key
+- Replace the `<string>` value with your actual AppsOnAir AppId
 
 ```xml
-<key>AppsOnAirAPIKey</key>
+<key>AppsonairAppId</key>
 <string>XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX</string>
 ```
 
