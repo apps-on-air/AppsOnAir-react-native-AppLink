@@ -1,3 +1,7 @@
+## 1.2.2
+
+- iOS dependency upgrade
+
 ## 1.2.1
 
 - Dependencies upgrade and improvements
@@ -7,7 +11,7 @@
 - `getReferralDetails()` method is now deprecated use `getReferralInfo()` instead.
 
 - Introduced `onReferralLinkDetected()` listner.
-    - It is triggered only when the app is installed and launched for the first time with a referral details.
+  - It is triggered only when the app is installed and launched for the first time with a referral details.
 
 ## 1.1.5
 
