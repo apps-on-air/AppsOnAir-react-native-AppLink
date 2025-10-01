@@ -4,6 +4,8 @@
 <dict>
 	<key>AppsonairAppId</key>
 	<string>APP_ID</string>
+	<key>EnableAdvancedDeferredLink</key>
+	<true />
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
