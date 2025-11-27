@@ -1,3 +1,7 @@
+## 1.2.4
+
+- Improvements & fixes.
+
 ## 1.2.3
 
 - Referral tracking enhancement.
