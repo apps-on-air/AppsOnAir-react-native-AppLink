@@ -4,7 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import com.appsonair.applink.interfaces.AppLinkListener
+import com.appsonair.applink.interfaces.AttributionListener
 import com.appsonair.applink.services.AppLinkService
 import com.facebook.react.bridge.*
 import com.facebook.react.module.annotations.ReactModule
@@ -34,7 +34,7 @@ class AppsonairReactNativeApplinkModule(reactContext: ReactApplicationContext) :
         ?: return promise.reject("NO_ACTIVITY", "Activity is null")
 
     appLinkService = AppLinkService.getInstance(activity)
-    appLinkService?.initialize(context, activity.intent, object : AppLinkListener {
+    appLinkService?.initialize(context, activity.intent, object : AttributionListener {
       override fun onDeepLinkProcessed(uri: Uri, result: JSONObject) {
         val params = Arguments.createMap()
         params.putString("uri", uri.toString())
@@ -45,9 +45,10 @@ class AppsonairReactNativeApplinkModule(reactContext: ReactApplicationContext) :
       override fun onDeepLinkError(uri: Uri?, error: String) {
       }
 
-      override fun onReferralLinkDetected(result: JSONObject) {
-        val map = jsonToWritableMap(result)
-        sendEvent("onReferralLinkDetected", map)
+      override fun onAttributionListener(result: JSONObject) {
+        sendEvent("onAttributionListener", jsonToWritableMap(result))
+        // Kept so existing onReferralLinkDetected subscribers keep working
+        sendEvent("onReferralLinkDetected", jsonToWritableMap(result))
       }
     })
 
@@ -67,10 +68,16 @@ class AppsonairReactNativeApplinkModule(reactContext: ReactApplicationContext) :
       val key = keys.next()
       val value = json.opt(key)
       when (value) {
+        // opt() returns the JSONObject.NULL sentinel for JSON nulls, never a Kotlin null. Without
+        // this branch it reaches the else and crosses the bridge as the string "null".
+        null, JSONObject.NULL -> map.putNull(key)
         is JSONObject -> map.putMap(key, jsonToWritableMap(value))
         is org.json.JSONArray -> map.putArray(key, jsonToWritableArray(value))
         is Boolean -> map.putBoolean(key, value)
         is Int -> map.putInt(key, value)
+        // The SDK stores firstInstallTime via put(String, long), so it arrives boxed as a Long and
+        // would otherwise stringify. JS numbers are doubles anyway, and epoch millis fit exactly.
+        is Long -> map.putDouble(key, value.toDouble())
         is Double -> map.putDouble(key, value)
         is String -> map.putString(key, value)
         else -> map.putString(key, value?.toString())
@@ -84,10 +91,12 @@ class AppsonairReactNativeApplinkModule(reactContext: ReactApplicationContext) :
     for (i in 0 until array.length()) {
       val value = array.opt(i)
       when (value) {
+        null, JSONObject.NULL -> writableArray.pushNull()
         is JSONObject -> writableArray.pushMap(jsonToWritableMap(value))
         is org.json.JSONArray -> writableArray.pushArray(jsonToWritableArray(value))
         is Boolean -> writableArray.pushBoolean(value)
         is Int -> writableArray.pushInt(value)
+        is Long -> writableArray.pushDouble(value.toDouble())
         is Double -> writableArray.pushDouble(value)
         is String -> writableArray.pushString(value)
         else -> writableArray.pushString(value?.toString())
@@ -114,6 +123,23 @@ class AppsonairReactNativeApplinkModule(reactContext: ReactApplicationContext) :
       )
     }
 
+    // JS numbers always cross the bridge as doubles, so read the ttl as one before narrowing.
+    // toHashMap() types its values as nullable; a JS null is serialized as JSON null by the SDK.
+    @Suppress("UNCHECKED_CAST")
+    val appsFlyer: Map<String, Any>? =
+      if (params.hasKey("appsFlyer") && !params.isNull("appsFlyer")) {
+        params.getMap("appsFlyer")?.toHashMap() as? Map<String, Any>
+      } else {
+        null
+      }
+
+    val attributionTtl: Int? =
+      if (params.hasKey("attributionTtl") && !params.isNull("attributionTtl")) {
+        params.getDouble("attributionTtl").toInt()
+      } else {
+        null
+      }
+
     CoroutineScope(Dispatchers.Main).launch {
       try {
         val result = appLinkService?.createAppLink(
@@ -128,6 +154,8 @@ class AppsonairReactNativeApplinkModule(reactContext: ReactApplicationContext) :
           isOpenInBrowserApple = params.getBoolean("isOpenInBrowserApple"),
           isOpenInIosApp = params.getBoolean("isOpenInIosApp"),
           iosFallbackUrl = params.getString("iosFallbackUrl") ?: "",
+          appsFlyer = appsFlyer,
+          attributionTtl = attributionTtl,
         )
         promise.resolve(result?.toString())
       } catch (e: Exception) {
@@ -136,6 +164,8 @@ class AppsonairReactNativeApplinkModule(reactContext: ReactApplicationContext) :
     }
   }
 
+  @Deprecated("Use getAttributionInfo instead")
+  @Suppress("DEPRECATION")
   @ReactMethod
   fun getReferralDetails(promise: Promise) {
     try {
@@ -161,6 +191,29 @@ class AppsonairReactNativeApplinkModule(reactContext: ReactApplicationContext) :
     }
   }
 
+  /**
+   * Returns the attribution details along with isFirstLaunch, firstInstallTime, isConsumed
+   * and any install referrer params, nested inside the data object.
+   */
+  @ReactMethod
+  fun getAttributionInfo(promise: Promise) {
+    CoroutineScope(Dispatchers.Main).launch {
+      try {
+        val attribution = appLinkService?.getAttributionInfo()
+
+        if (attribution != null) {
+          promise.resolve(jsonToWritableMap(attribution))
+        } else {
+          promise.reject("NO_ATTRIBUTION", "No attribution details available")
+        }
+      } catch (e: Exception) {
+        promise.reject("ATTRIBUTION_ERROR", e.message, e)
+      }
+    }
+  }
+
+  @Deprecated("Use getAttributionInfo instead")
+  @Suppress("DEPRECATION")
   @ReactMethod
   fun getReferralInfo(promise: Promise) {
     CoroutineScope(Dispatchers.Main).launch {
