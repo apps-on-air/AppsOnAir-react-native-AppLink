@@ -1,3 +1,22 @@
+## 2.0.0
+
+- Android and iOS native dependencies upgraded to 2.0.0.
+
+- Introduced `getAttributionInfo()` method.
+  - `getReferralInfo()` and `getReferralDetails()` are now deprecated, use `getAttributionInfo()` instead.
+
+- Introduced `onAttributionListener()` listener.
+  - `onReferralLinkDetected()` is now deprecated, use `onAttributionListener()` instead.
+  - It is triggered when an attribution is detected and again when the app returns to the foreground, so gate one time logic on `isFirstLaunch`.
+
+- Attribution details are now included in the response `data`: `isFirstLaunch`, `firstInstallTime`, `isConsumed` and `attributionStatus`.
+  - `applink_click_time` is also included when the click time is available.
+
+- `createAppLink()` accepts optional `appsFlyer` and `attributionTtl` parameters.
+
+- `firstInstallTime` is now epoch milliseconds as a number on both platforms.
+
+
 ## 1.2.5
 
 - Improvements & fixes.
