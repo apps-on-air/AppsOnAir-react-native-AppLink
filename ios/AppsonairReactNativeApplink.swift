@@ -6,13 +6,10 @@ import AppsOnAir_AppLink
 class AppsonairReactNativeApplink: RCTEventEmitter {
     
   private var hasListeners = false
-  private var pendingEvents: [[String: Any]] = []
-    
-  private var pendingDeepLinkEvent: [String: Any]? = nil
-  private var pendingReferralEvent: [String: Any]? = nil
+  private var pendingEvents: [(name: String, body: [String: Any])] = []
 
   override func supportedEvents() -> [String] {
-    return ["onDeepLinkProcessed", "onReferralLinkDetected"]
+    return ["onDeepLinkProcessed", "onReferralLinkDetected", "onAttributionListener"]
   }
 
   override static func requiresMainQueueSetup() -> Bool {
@@ -33,21 +30,8 @@ class AppsonairReactNativeApplink: RCTEventEmitter {
   override func startObserving() {
     hasListeners = true
 
-    if let event = pendingDeepLinkEvent {
-      sendEvent(withName: "onDeepLinkProcessed", body: event)
-      pendingDeepLinkEvent = nil
-    }
-
-    if let event = pendingReferralEvent {
-      sendEvent(withName: "onReferralLinkDetected", body: event)
-      pendingReferralEvent = nil
-    }
-
     for event in pendingEvents {
-      if let name = event["name"] as? String,
-      let body = event["body"] as? [String: Any] {
-        sendEvent(withName: name, body: body)
-      }
+      sendEvent(withName: event.name, body: event.body)
     }
     pendingEvents.removeAll()
   }
@@ -62,24 +46,19 @@ class AppsonairReactNativeApplink: RCTEventEmitter {
     DispatchQueue.main.async {
       self.appLinkService.initialize(
         onDeepLinkProcessed: { url, linkInfo in
-        if let url = url {
-          let eventData: [String: Any] = [
-            "uri": url.absoluteString,
-            "result": linkInfo
-          ]
-          if self.hasListeners {
-            self.sendEvent(withName: "onDeepLinkProcessed", body: eventData)
-          } else {
-            self.pendingDeepLinkEvent = eventData
+          if let url = url {
+            self.sendEvent(name: "onDeepLinkProcessed", body: [
+              "uri": url.absoluteString,
+              "result": linkInfo
+            ])
           }
-        }
-      },
-        onReferralLinkDetected: { referralInfo in
-          if self.hasListeners {
-            self.sendEvent(withName: "onReferralLinkDetected", body: referralInfo)
-          } else {
-            self.pendingDeepLinkEvent = referralInfo
-          }
+        },
+        onAttributionListener: { attributionInfo in
+          self.sendEvent(name: "onAttributionListener", body: attributionInfo)
+          // Kept so existing onReferralLinkDetected subscribers keep working. The SDK's own
+          // onReferralLinkDetected passes the bare referral dictionary, but we forward the
+          // enriched attribution payload — a superset — to match the Android bridge.
+          self.sendEvent(name: "onReferralLinkDetected", body: attributionInfo)
         }
       )
     }
@@ -90,7 +69,7 @@ class AppsonairReactNativeApplink: RCTEventEmitter {
     if hasListeners {
       self.sendEvent(withName: name, body: body)
     } else {
-      pendingEvents.append(["name": name, "body": body])
+      pendingEvents.append((name: name, body: body))
     }
   }
 
@@ -130,6 +109,13 @@ class AppsonairReactNativeApplink: RCTEventEmitter {
     let isOpenInAndroidApp = params["isOpenInAndroidApp"] as? Bool ?? true
     let androidFallbackUrl = params["androidFallbackUrl"] as? String ?? ""
 
+    // A JS `undefined` is dropped crossing the bridge, but an explicit `null` arrives as NSNull,
+    // so both cases have to collapse back to nil before reaching the SDK.
+    // The rest of this call resolves to the Swift-native createAppLink overload (Bool? flags),
+    // so the ttl has to be an Int? rather than the NSNumber? the @objc overload wants.
+    let appsFlyer = params["appsFlyer"] as? [String: Any]
+    let attributionTtl = (params["attributionTtl"] as? NSNumber)?.intValue
+
     appLinkService.createAppLink(
       url: url,
       name: name,
@@ -141,7 +127,9 @@ class AppsonairReactNativeApplink: RCTEventEmitter {
       iosFallbackUrl: iosFallbackUrl,
       isOpenInAndroidApp: isOpenInAndroidApp,
       isOpenInBrowserAndroid: isOpenInBrowserAndroid,
-      androidFallbackUrl: androidFallbackUrl
+      androidFallbackUrl: androidFallbackUrl,
+      appsFlyer: appsFlyer,
+      attributionTtl: attributionTtl
     ) { linkInfo in
       if let status = linkInfo["status"] as? String, status == "SUCCESS" {
         resolve(linkInfo)
@@ -153,6 +141,7 @@ class AppsonairReactNativeApplink: RCTEventEmitter {
     }
   }
 
+  @available(*, deprecated, message: "Use getAttributionInfo instead")
   @objc(getReferralDetails:withRejecter:)
   func getReferralDetails(
     resolve: @escaping RCTPromiseResolveBlock,
@@ -162,7 +151,8 @@ class AppsonairReactNativeApplink: RCTEventEmitter {
       resolve(linkInfo)
     }
   }
-  
+
+  @available(*, deprecated, message: "Use getAttributionInfo instead")
   @objc(getReferralInfo:withRejecter:)
   func getReferralInfo(
     resolve: @escaping RCTPromiseResolveBlock,
@@ -170,6 +160,18 @@ class AppsonairReactNativeApplink: RCTEventEmitter {
   ) {
     appLinkService.getReferralInfo { linkInfo in
       resolve(linkInfo)
+    }
+  }
+
+  /// Returns the referral details with `isFirstLaunch`, `firstInstallTime`, `isConsumed` and
+  /// (clipboard / advanced deferred link approach only) `attributionStatus` nested in `data`.
+  @objc(getAttributionInfo:withRejecter:)
+  func getAttributionInfo(
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) {
+    appLinkService.getAttributionInfo { attributionInfo in
+      resolve(attributionInfo)
     }
   }
 }
