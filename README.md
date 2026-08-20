@@ -7,6 +7,7 @@
 - ✅ Deep link support (URI schemes and AppLinks)
 - ✅ Fallback behavior (e.g., open Play Store or App Store)
 - ✅ Custom domain support
+- ✅ Referral and install attribution tracking
 - ✅ Seamless migration from Firebase Dynamic Links to AppLink
 
 **Note:** For comprehensive instructions on migrating Firebase Dynamic Links to AppLinks, refer to the [documentation](https://documentation.appsonair.com/MobileQuickstart/AppLink/firebase-dynamiclinks-migration).
@@ -256,23 +257,23 @@ const App = () => {
 };
 ```
 
-### Function 3: Listen for Referral Events
+### Function 3: Listen for Attribution Events
 
-Use `onReferralLinkDetected` to listen for referral detected after **initialization**. This allows you to respond to navigation events or extract data from the link.
+Use `onAttributionListener` to listen for attribution data after **initialization**. This allows you to respond to navigation events or extract data from the link.
 
 ```tsx
 import React, { useEffect } from 'react';
 import {
   initializeAppLink,
-  onReferralLinkDetected
+  onAttributionListener
 } from 'appsonair-react-native-applink';
 
 const App = () => {
   useEffect(() => {
     initializeAppLink();
 
-    const sub = onReferralLinkDetected((event) => {
-      console.log(`✅ Referral:\n${JSON.stringify(event, null, 2)}`);
+    const sub = onAttributionListener((event) => {
+      console.log(`✅ Attribution:\n${JSON.stringify(event, null, 2)}`);
     });
 
     return () => {
@@ -285,6 +286,17 @@ const App = () => {
   );
 };
 ```
+
+`onAttributionListener` fires at most twice, on both platforms: once when the attribution is first
+detected, and once more on the return to the foreground that follows `isFirstLaunch` flipping to
+`false`, so the payload carries that flip. It does not fire on later foreground returns — they
+would only repeat the same persisted state. Gate any one time logic — analytics, navigation,
+granting a referral reward — on `isFirstLaunch` rather than on the callback firing, or
+de-duplicate by `shortId`. The payload is the same one
+[`getAttributionInfo`](#function-5-get-attribution-info) resolves to.
+
+A plain cold start of an already installed app does not emit: the first detection only runs on the
+first launch after installation. Use `getAttributionInfo` when you need the value on demand.
 
 ### Function 4: Create a New AppLink
 
@@ -311,6 +323,18 @@ const App = () => {
     isOpenInBrowserAndroid: false,
     isOpenInIosApp: true,
     isOpenInBrowserApple: false,
+    // Attribution window for this link, in seconds. An install inside it is attributed to the
+    // click; past it the install is treated as organic.
+    attributionTtl: 3600,
+    // Optional AppsFlyer attribution parameters, forwarded to the API untouched.
+    appsFlyer: {
+      channel: 'email',
+      campaignId: '01',
+      campaign: 'summer_sale',
+      subs: ['sub1', 'sub2'],
+      metaTitle: 'metaTitle',
+      metaDescription: 'metaDescription',
+    },
   });
 
   const handleCreateLink = async () => {
@@ -353,24 +377,72 @@ const App = () => {
 };
 ```
 
-### Function 5: Get Referral Info
+#### Attribution parameters
 
-Use `getReferralInfo` to retrieve any referral data passed through a deep link.
+Both are optional. Omit them and the link behaves exactly as before.
+
+| Parameter | Type | Description |
+| --- | --- | --- |
+| `attributionTtl` | Number | Attribution window for this link, **in seconds**. An install that happens within this window of the click is reported as `non-organic` and carries the referral data; once the window has elapsed the click no longer attributes the install, and the referral is re-read from an IP based lookup instead. Applies to `getAttributionInfo()` and both deprecated getters. |
+| `appsFlyer` | Object | AppsFlyer attribution parameters, forwarded to the API untouched. Keys beyond the documented ones are passed through as-is. |
+
+`appsFlyer` accepts:
+
+| Key | Type | Description |
+| --- | --- | --- |
+| `channel` | String | Media source / channel driving traffic to this link. |
+| `campaignId` | String | Unique identifier for the marketing campaign. |
+| `campaign` | String | Human-readable campaign name. |
+| `subs` | String[] | Sub-parameters for granular tracking. |
+| `metaTitle` | String | Title used for attribution metadata. |
+| `metaDescription` | String | Description used for attribution metadata. |
+
+When a link carries `appsFlyer`, the resulting `appsFlyer` object appears in the payload of
+`getAttributionInfo()` and `onAttributionListener`. It is deliberately **absent** from the
+deprecated referral surface — `getReferralInfo()`, `getReferralDetails()` and
+`onReferralLinkDetected()` — which keeps its original shape.
+
+### Function 5: Get Attribution Info
+
+Use `getAttributionInfo` to retrieve the referral and attribution data for this install.
 
 ```tsx
 import { Button } from 'react-native';
-import { getReferralInfo } from 'appsonair-react-native-applink';
+import { getAttributionInfo } from 'appsonair-react-native-applink';
 
 const App = () => {
-  const handleReferralDetails = async () => {
+  const handleAttributionDetails = async () => {
     try {
-      const info = await getReferralInfo();
-      console.log('Referral Info', JSON.stringify(info, null, 2));
+      const info = await getAttributionInfo();
+      console.log('Attribution Info', JSON.stringify(info, null, 2));
     } catch (err) {
       console.log('Error', JSON.stringify(err, null, 2));
     }
   };
 
-  return <Button title="Get Referral Info" onPress={handleReferralDetails} />;
+  return <Button title="Get Attribution Info" onPress={handleAttributionDetails} />;
 };
 ```
+
+Along with the referral details, `getAttributionInfo` and `onAttributionListener` add the
+following keys inside the `data` object of the response:
+
+| Response Key | Type | Description |
+| --- | --- | --- |
+| `isFirstLaunch` | Boolean | `true` during the first launch after installation, until the app leaves the foreground. |
+| `firstInstallTime` | Long | Timestamp (epoch milliseconds) of the app's first installation. |
+| `applink_click_time` | Long | Timestamp (epoch milliseconds) of the click this install is attributed to. Absent when the install referrer carried none. |
+| `isConsumed` | Boolean | `true` when `attributionStatus` is `non-organic`. |
+| `attributionStatus` | String | `non-organic` when the install happened within `attributionTtl` of the click, `organic` otherwise. |
+
+### Deprecated APIs
+
+The following APIs are deprecated and will be removed in a future release. Existing
+integrations keep working, but should migrate:
+
+| Deprecated | Use instead |
+| --- | --- |
+| `onReferralLinkDetected` | `onAttributionListener` |
+| `getReferralInfo` | `getAttributionInfo` |
+| `getReferralDetails` | `getAttributionInfo` |
+
