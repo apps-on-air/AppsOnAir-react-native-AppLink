@@ -53,17 +53,24 @@ class AppsonairReactNativeApplink: RCTEventEmitter {
             ])
           }
         },
+        // Both events come from their own SDK callback, so each keeps its own payload and
+        // cadence: onReferralLinkDetected stays detection-only with `appsFlyer` stripped by the
+        // SDK, while onAttributionListener carries the attribution fields. Same wiring as the
+        // Android bridge.
+        onReferralLinkDetected: { referralInfo in
+          self.sendEvent(name: "onReferralLinkDetected", body: referralInfo)
+        },
         onAttributionListener: { attributionInfo in
           self.sendEvent(name: "onAttributionListener", body: attributionInfo)
-          // Kept so existing onReferralLinkDetected subscribers keep working. The SDK's own
-          // onReferralLinkDetected passes the bare referral dictionary, but we forward the
-          // enriched attribution payload — a superset — to match the Android bridge.
-          self.sendEvent(name: "onReferralLinkDetected", body: attributionInfo)
         }
       )
+      // Resolved inside the block: the SDK is only initialized once `initialize` has run, so
+      // resolving outside would let an awaited caller reach an API method while Core's app id
+      // is still empty.
+      resolve(true)
     }
-    resolve(true)
   }
+
 
   private func sendEvent(name: String, body: [String: Any]) {
     if hasListeners {

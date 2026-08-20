@@ -4,7 +4,8 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import com.appsonair.applink.interfaces.AttributionListener
+import android.util.Log
+import com.appsonair.applink.interfaces.AppLinkListener
 import com.appsonair.applink.services.AppLinkService
 import com.facebook.react.bridge.*
 import com.facebook.react.module.annotations.ReactModule
@@ -28,13 +29,14 @@ class AppsonairReactNativeApplinkModule(reactContext: ReactApplicationContext) :
     return NAME
   }
 
+  @Suppress("DEPRECATION")
   @ReactMethod
   fun initialize(promise: Promise) {
     val activity = reactApplicationContext.currentActivity
         ?: return promise.reject("NO_ACTIVITY", "Activity is null")
 
     appLinkService = AppLinkService.getInstance(activity)
-    appLinkService?.initialize(context, activity.intent, object : AttributionListener {
+    appLinkService?.initialize(context, activity.intent, object : AppLinkListener {
       override fun onDeepLinkProcessed(uri: Uri, result: JSONObject) {
         val params = Arguments.createMap()
         params.putString("uri", uri.toString())
@@ -47,7 +49,10 @@ class AppsonairReactNativeApplinkModule(reactContext: ReactApplicationContext) :
 
       override fun onAttributionListener(result: JSONObject) {
         sendEvent("onAttributionListener", jsonToWritableMap(result))
-        // Kept so existing onReferralLinkDetected subscribers keep working
+      }
+
+      @Deprecated("Use onAttributionListener instead")
+      override fun onReferralLinkDetected(result: JSONObject) {
         sendEvent("onReferralLinkDetected", jsonToWritableMap(result))
       }
     })
