@@ -1,3 +1,6 @@
+## 2.0.1
+- Native dependency update.
+
 ## 2.0.0
 
 * `getReferralInfo()` is now deprecated, use `getAttributionInfo()` instead.
