@@ -14,6 +14,7 @@ import {
 import DeviceInfo from 'react-native-device-info';
 import {
   createAppLink,
+  getAppLinkInfo,
   getAttributionInfo,
   getReferralDetails,
   getReferralInfo,
@@ -31,6 +32,9 @@ const App = () => {
   const [attributionResult, setAttributionResult] = useState('');
   const [referralResult, setReferralResult] = useState('');
   const [installReferrer, setInstallReferrer] = useState('');
+  const [appLinkInfoShortId, setAppLinkInfoShortId] = useState('');
+  const [appLinkInfoUrlPrefix, setAppLinkInfoUrlPrefix] = useState('');
+  const [appLinkInfoResult, setAppLinkInfoResult] = useState('');
   // Nested params are kept outside linkParams so the flat input helper stays simple.
   const [attributionTtl, setAttributionTtl] = useState('');
   // No UI for these at the moment, so they stay empty; index.tsx maps empty strings to null.
@@ -166,6 +170,21 @@ const App = () => {
       Alert.alert('Attribution Info', JSON.stringify(info, null, 2));
     } catch (error) {
       Alert.alert('Error', JSON.stringify(error, null, 2));
+    }
+  };
+
+  const handleAppLinkInfo = async () => {
+    try {
+      const info = await getAppLinkInfo({
+        shortId: appLinkInfoShortId.trim(),
+        urlPrefix: appLinkInfoUrlPrefix.trim(),
+      });
+      console.log(`ℹ️ App link info:\n${JSON.stringify(info, null, 2)}`);
+      setAppLinkInfoResult(JSON.stringify(info, null, 2));
+    } catch (error: any) {
+      setAppLinkInfoResult(
+        `Error: ${error?.message || JSON.stringify(error, null, 2)}`
+      );
     }
   };
 
@@ -312,6 +331,20 @@ const App = () => {
         </Text>
         <Text style={styles.resultBox} selectable={true}>
           {attributionResult || 'Waiting for attribution...'}
+        </Text>
+
+        <Text style={styles.sectionTitle}>Get App Link Info</Text>
+        {renderInput('Short ID', appLinkInfoShortId, setAppLinkInfoShortId)}
+        {renderInput(
+          'URL Prefix (no http/https)',
+          appLinkInfoUrlPrefix,
+          setAppLinkInfoUrlPrefix
+        )}
+        <View style={styles.buttonGroup}>
+          <Button title="Get App Link Info" onPress={handleAppLinkInfo} />
+        </View>
+        <Text style={styles.resultBox} selectable={true}>
+          {appLinkInfoResult || 'Not fetched yet.'}
         </Text>
 
         <Text style={styles.sectionTitle}>Deprecated APIs</Text>
