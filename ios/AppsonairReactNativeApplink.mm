@@ -16,6 +16,10 @@ RCT_EXTERN_METHOD(getReferralInfo:(RCTPromiseResolveBlock)resolve
                   withRejecter:(RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(getAttributionInfo:(RCTPromiseResolveBlock)resolve
                   withRejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(getAppLinkInfo:(NSString *)shortId
+                  urlPrefix:(NSString *)urlPrefix
+                  withResolver:(RCTPromiseResolveBlock)resolve
+                  withRejecter:(RCTPromiseRejectBlock)reject)
 
 RCT_EXTERN_METHOD(addListener:(NSString *)eventName)
 RCT_EXTERN_METHOD(removeListeners:(double)count)

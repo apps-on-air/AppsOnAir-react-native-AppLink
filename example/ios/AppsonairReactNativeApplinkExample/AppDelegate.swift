@@ -2,13 +2,9 @@ import UIKit
 import React
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
-import AppsOnAir_AppLink
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
-  var window: UIWindow?
-  let appLinkService = AppLinkService.shared
-
   var reactNativeDelegate: ReactNativeDelegate?
   var reactNativeFactory: RCTReactNativeFactory?
 
@@ -23,28 +19,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     reactNativeDelegate = delegate
     reactNativeFactory = factory
 
-    window = UIWindow(frame: UIScreen.main.bounds)
-
-    factory.startReactNative(
-      withModuleName: "AppsonairReactNativeApplinkExample",
-      in: window,
-      launchOptions: launchOptions
-    )
-
-    return true
-  }
-
-  func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
-    guard userActivity.activityType == NSUserActivityTypeBrowsingWeb,
-    let url = userActivity.webpageURL else {
-      return false
-    }
-    appLinkService.handleAppLink(incomingURL: url)
-    return true
-  }
-
-  func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-    appLinkService.handleAppLink(incomingURL: url)
+    // The window is created in SceneDelegate (UIScene lifecycle, required by iOS 27).
     return true
   }
 }

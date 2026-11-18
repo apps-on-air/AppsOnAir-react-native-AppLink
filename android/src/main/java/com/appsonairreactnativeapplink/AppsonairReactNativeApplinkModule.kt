@@ -217,6 +217,24 @@ class AppsonairReactNativeApplinkModule(reactContext: ReactApplicationContext) :
     }
   }
 
+  /**
+   * Fetches link details by short ID and domain. The SDK reports failures in the returned
+   * JSON (`error` / `statusCode` + `message`), so it is resolved as-is, same as iOS.
+   */
+  @ReactMethod
+  fun getAppLinkInfo(shortId: String, urlPrefix: String, promise: Promise) {
+    val service = appLinkService
+      ?: return promise.reject("NOT_INITIALIZED", "Call initializeAppLink() before getAppLinkInfo()")
+
+    CoroutineScope(Dispatchers.Main).launch {
+      try {
+        promise.resolve(jsonToWritableMap(service.getAppLinkInfo(shortId, urlPrefix)))
+      } catch (e: Exception) {
+        promise.reject("APP_LINK_INFO_ERROR", e.message, e)
+      }
+    }
+  }
+
   @Deprecated("Use getAttributionInfo instead")
   @Suppress("DEPRECATION")
   @ReactMethod

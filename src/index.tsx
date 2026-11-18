@@ -6,6 +6,8 @@ import {
 } from 'react-native';
 
 import type {
+  AppLinkInfoParams,
+  AppLinkInfoResponse,
   AppLinkParams,
   AttributionInfo,
   CreateAppLinkResponse,
@@ -87,6 +89,30 @@ export const createAppLink = async ({
 
   if (typeof result === 'string') {
     return JSON.parse(result);
+  }
+
+  return result;
+};
+
+/**
+ * Fetches the details of an existing AppLink on demand.
+ * Only returns data for links belonging to your configured AppsOnAir App ID.
+ *
+ * @param {AppLinkInfoParams} params - `shortId` (last path segment of the link URL) and
+ * `urlPrefix` (link domain without `http://` / `https://`).
+ * @returns {Promise<AppLinkInfoResponse>} The link details, or an error object if the fetch fails.
+ */
+export const getAppLinkInfo = async ({
+  shortId,
+  urlPrefix,
+}: AppLinkInfoParams): Promise<AppLinkInfoResponse> => {
+  let result = await AppsonairReactNativeApplink.getAppLinkInfo(
+    shortId,
+    urlPrefix
+  );
+
+  if (typeof result === 'string') {
+    result = JSON.parse(result);
   }
 
   return result;

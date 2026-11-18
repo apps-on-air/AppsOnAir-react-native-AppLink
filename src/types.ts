@@ -50,6 +50,40 @@ export type CreateAppLinkResponse =
       error: string;
     };
 
+export type AppLinkInfoParams = {
+  /** Last path segment of the link URL. */
+  shortId: string;
+  /** Domain of the link, without scheme (e.g. `example.appsonair.link`). */
+  urlPrefix: string;
+};
+
+export type AppLinkInfoResponse =
+  | {
+      status: string;
+      message: string;
+      data: {
+        name: string;
+        link: string;
+        shortId: string;
+        socialMetaTags?: {
+          title?: string;
+          description?: string;
+          imageUrl?: string;
+        };
+        /** Time-to-live, in seconds, for attribution of this link. */
+        attributionTtl?: number;
+        /** Included only when the link was created with AppsFlyer params. */
+        appsFlyer?: AppsFlyerParams;
+      };
+    }
+  | {
+      statusCode: number;
+      message: string;
+    }
+  | {
+      error: string;
+    };
+
 export type LinkInfo = {
   message: string;
   status: string;

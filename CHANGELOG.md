@@ -1,3 +1,14 @@
+## 2.1.0
+
+* Introduced `getAppLinkInfo()` method.
+    * Fetches link details on demand using the `shortId` and `urlPrefix`. Only returns data for links belonging to your configured `AppsonairAppId`.
+    * When the link was created with AppsFlyer params, the response includes an `appsFlyer` object inside `data`.
+
+* Updated iOS native dependency `AppsOnAir-AppLink` to `2.1.0`.
+    * Added iOS 27 support (apps built with the iOS 27 SDK must use the UIScene lifecycle; the SDK detects the scene delegate automatically).
+    * The same link received twice within 2 seconds is processed only once.
+* **Breaking:** Minimum iOS version is now 15.0.
+
 ## 2.0.1
 - Native dependency update.
 

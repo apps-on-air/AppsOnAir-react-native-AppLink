@@ -31,5 +31,19 @@ target 'AppsonairReactNativeApplinkExample' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+
+    # Some pods (e.g. RNDeviceInfo's privacy resource bundle) default to iOS 9.0,
+    # which Xcode no longer supports. Raise them to the app's minimum.
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        if config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'].to_f < min_ios_version_supported.to_f
+          config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = min_ios_version_supported
+        end
+        # fmt 11.0.2 (bundled with RN 0.79) fails on newer Xcode clang with C++20 consteval errors.
+        if target.name == 'fmt'
+          config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17'
+        end
+      end
+    end
   end
 end
