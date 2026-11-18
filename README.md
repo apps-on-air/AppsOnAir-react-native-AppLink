@@ -38,7 +38,7 @@ cd ..
 
 ### iOS
 
-- Minimum deployment target: iOS 13.0
+- Minimum deployment target: iOS 15.0
 
 ## Android Setup
 
@@ -202,6 +202,8 @@ let appLinkService = AppLinkService.shared
     }
 
 ```
+
+> **iOS 27:** Apps built with the iOS 27 SDK must adopt the UIScene lifecycle (`UIApplicationSceneManifest` in Info.plist with a scene delegate), otherwise they fail to launch. The SDK automatically detects the scene delegate class declared in the scene manifest or returned from `application(_:configurationForConnecting:options:)`, whatever its class name.
 
 ## Usage
 
