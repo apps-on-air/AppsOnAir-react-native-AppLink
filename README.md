@@ -437,6 +437,66 @@ following keys inside the `data` object of the response:
 | `isConsumed` | Boolean | `true` when `attributionStatus` is `non-organic`. |
 | `attributionStatus` | String | `non-organic` when the install happened within `attributionTtl` of the click, `organic` otherwise. |
 
+### Function 6: Get AppLink Info
+
+Use `getAppLinkInfo` to fetch the details of an existing link on demand. Only returns data for links belonging to your configured **AppsonairAppId**.
+
+```tsx
+import { Button } from 'react-native';
+import { getAppLinkInfo } from 'appsonair-react-native-applink';
+
+const App = () => {
+  const handleAppLinkInfo = async () => {
+    try {
+      const info = await getAppLinkInfo({
+        shortId: 'LINK_SHORT_ID', // Last path segment of the link URL
+        urlPrefix: 'YOUR_DOMAIN_NAME', // Domain without http/https
+      });
+      console.log('AppLink Info', JSON.stringify(info, null, 2));
+    } catch (err) {
+      console.log('Error', JSON.stringify(err, null, 2));
+    }
+  };
+
+  return <Button title="Get AppLink Info" onPress={handleAppLinkInfo} />;
+};
+```
+
+| Parameter | Type | Required | Description |
+| --- | --- | --- | --- |
+| `shortId` | String | ✅ | Last path segment of the link URL. |
+| `urlPrefix` | String | ✅ | Domain of the link, without scheme (e.g. `example.appsonair.link`). |
+
+**Response:**
+
+```json
+{
+  "data": {
+    "name": "Link Name",
+    "link": "https://example.com/target-page",
+    "shortId": "LINK_SHORT_ID",
+    "socialMetaTags": {
+      "title": "Link Title",
+      "description": "Link Description",
+      "imageUrl": "https://example.com/image.png"
+    },
+    "attributionTtl": 3600,
+    "appsFlyer": {
+      "channel": "appsonair",
+      "campaignId": "01",
+      "campaign": "test",
+      "subs": ["sub1", "sub2", "sub3", "sub4", "sub5"],
+      "metaTitle": "metaTitle",
+      "metaDescription": "metaDescription"
+    }
+  },
+  "message": "AppLink fetched successfully!",
+  "status": "SUCCESS"
+}
+```
+
+> `appsFlyer` is included only when the link was created with AppsFlyer params. On failure the promise resolves with `{ error }` or `{ statusCode, message }` instead.
+
 ### Deprecated APIs
 
 The following APIs are deprecated and will be removed in a future release. Existing
