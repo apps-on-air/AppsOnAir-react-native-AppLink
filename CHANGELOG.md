@@ -1,3 +1,10 @@
+## 2.1.0
+
+* Updated iOS native dependency `AppsOnAir-AppLink` to `2.1.0`.
+    * Added iOS 27 support (apps built with the iOS 27 SDK must use the UIScene lifecycle; the SDK detects the scene delegate automatically).
+    * The same link received twice within 2 seconds is processed only once.
+* **Breaking:** Minimum iOS version is now 15.0.
+
 ## 2.0.1
 - Native dependency update.
 
