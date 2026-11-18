@@ -181,4 +181,18 @@ class AppsonairReactNativeApplink: RCTEventEmitter {
       resolve(attributionInfo)
     }
   }
+
+  /// Fetches link details by short ID and domain. The SDK reports failures in the returned
+  /// dictionary (`error` / `statusCode` + `message`), so it is resolved as-is, same as Android.
+  @objc(getAppLinkInfo:urlPrefix:withResolver:withRejecter:)
+  func getAppLinkInfo(
+    shortId: String,
+    urlPrefix: String,
+    resolve: @escaping RCTPromiseResolveBlock,
+    reject: @escaping RCTPromiseRejectBlock
+  ) {
+    appLinkService.getAppLinkInfo(shortId: shortId, urlPrefix: urlPrefix) { linkInfo in
+      resolve(linkInfo)
+    }
+  }
 }
